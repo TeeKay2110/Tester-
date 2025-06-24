@@ -1,0 +1,88 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>2PAY Login & Register</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <style>
+    body { font-family: sans-serif; background: #f2f2f2; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
+    .form-box { background: white; padding: 20px; border-radius: 10px; width: 300px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .form-box h2 { margin-bottom: 10px; }
+    .form-box input { width: 100%; padding: 10px; margin: 8px 0; }
+    .form-box button { width: 100%; padding: 10px; background: #2d8cff; color: white; border: none; margin-top: 10px; cursor: pointer; }
+    .toggle-link { color: #2d8cff; cursor: pointer; margin-top: 10px; text-align: center; display: block; }
+  </style>
+</head>
+<body>  <div class="form-box" id="registerBox">
+    <h2>Register</h2>
+    <input type="email" id="regEmail" placeholder="Email">
+    <input type="password" id="regPassword" placeholder="Password">
+    <input type="number" id="age" placeholder="Age">
+    <input type="text" id="country" placeholder="Country">
+    <input type="text" id="promo" placeholder="Promo Code (optional)">
+    <button onclick="register()">Register</button>
+    <span class="toggle-link" onclick="toggleForm('login')">Already have an account? Login</span>
+  </div>  <div class="form-box" id="loginBox" style="display:none">
+    <h2>Login</h2>
+    <input type="email" id="loginEmail" placeholder="Email">
+    <input type="password" id="loginPassword" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <span class="toggle-link" onclick="toggleForm('register')">Don't have an account? Register</span>
+  </div>  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDvFDByPPo9zgwKLdPaREz1OVMQCXmPfrs",
+      authDomain: "bets-d795d.firebaseapp.com",
+      databaseURL: "https://bets-d795d-default-rtdb.firebaseio.com",
+      projectId: "bets-d795d",
+      storageBucket: "bets-d795d.appspot.com",
+      messagingSenderId: "384386108287",
+      appId: "1:384386108287:android:d238a5ec8068d9bb9be84a"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    function register() {
+      const email = document.getElementById("regEmail").value.trim();
+      const password = document.getElementById("regPassword").value.trim();
+      const age = document.getElementById("age").value.trim();
+      const country = document.getElementById("country").value.trim();
+      const promo = document.getElementById("promo").value.trim();
+
+      if (!email || !password || !age || !country) {
+        return alert("Please fill all required fields.");
+      }
+
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(userCred => {
+          const uid = userCred.user.uid;
+          db.ref("users/" + uid).set({
+            email,
+            age,
+            country,
+            promoCode: promo,
+            balance: 0
+          }).then(() => {
+            window.location.href = "main.html";
+          });
+        })
+        .catch(err => alert(err.message));
+    }
+
+    function login() {
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value.trim();
+
+      auth.signInWithEmailAndPassword(email, password)
+        .then(() => window.location.href = "main.html")
+        .catch(err => alert(err.message));
+    }
+
+    function toggleForm(view) {
+      document.getElementById("registerBox").style.display = view === 'register' ? 'block' : 'none';
+      document.getElementById("loginBox").style.display = view === 'login' ? 'block' : 'none';
+    }
+  </script></body>
+</html>
