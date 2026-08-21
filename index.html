@@ -2,34 +2,47 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>WebSocket Tester</title>
+  <title>WebSocket Message Viewer</title>
 </head>
 <body>
-  <h3>WebSocket Test</h3>
+  <h3>WebSocket Messages</h3>
   <pre id="output">Connecting...</pre>
 
   <script>
     const output = document.getElementById("output");
 
-    // Use a WebSocket server you own or have permission to test.
+    function log(message) {
+      output.textContent += "\n" + message;
+    }
+
     const ws = new WebSocket("wss://eu-central-1-game6.spribegaming.com/BlueBox/websocket");
 
     ws.onopen = () => {
-      output.textContent += "\nConnected!";
+      log("✅ Connected");
     };
 
     ws.onmessage = (event) => {
-      output.textContent += "\n\nReceived:\n" + event.data;
+      log("\n📨 Incoming message:");
+      
+      if (typeof event.data === "string") {
+        log(event.data);
+      } else if (event.data instanceof Blob) {
+        log(`[Binary Blob: ${event.data.size} bytes]`);
+
+        event.data.text().then(text => {
+          log(text);
+        });
+      } else if (event.data instanceof ArrayBuffer) {
+        log(`[Binary data: ${event.data.byteLength} bytes]`);
+      }
     };
 
-    ws.onerror = (error) => {
-      output.textContent += "\n\nWebSocket error.";
-      console.error(error);
+    ws.onerror = () => {
+      log("❌ WebSocket error");
     };
 
     ws.onclose = (event) => {
-      output.textContent +=
-        `\n\nConnection closed. Code: ${event.code}`;
+      log(`\n🔌 Closed — code: ${event.code}`);
     };
   </script>
 </body>
