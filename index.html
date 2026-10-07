@@ -1052,9 +1052,6 @@ let wheelRotation = 0;
    Secret Host Choice.
 
    This is intentionally NOT displayed anywhere.
-
-   The selected participant and prize remain hidden
-   until the next wheel spin is completed.
 */
 let hostChoicePending = null;
 
@@ -1800,20 +1797,53 @@ function chooseRandomPrize(){
     if(!prizes.length)
         return null;
 
+    /*
+       RANDOM PRIZE RARITY
+
+       Prize 1 = Common
+       Prize 2 = Less Common
+       Prize 3 = Rare
+       Prize 4 = Very Rare
+       Prize 5 = Extremely Rare
+       Prize 6 = Ultimate / Supreme Rare
+
+       These are RELATIVE weights, not fixed
+       "one out of X spins" guarantees.
+
+       Prize 7+ are deliberately NOT included.
+       They have 0% chance in normal random draw
+       and can ONLY be selected through Host Choice.
+    */
+
     const weights = [
-        40,
-        25,
-        15,
-        10,
-        6,
-        4
+
+        50,    // Prize 1 - Common
+
+        25,    // Prize 2 - Less Common
+
+        13,    // Prize 3 - Rare
+
+        7,     // Prize 4 - Very Rare
+
+        3.5,   // Prize 5 - Extremely Rare
+
+        1.5    // Prize 6 - Ultimate Supreme Rare
+
     ];
 
     /*
-       ONLY Prize 1 through Prize 6
-       are available to normal random draw.
+       If fewer than 6 prizes exist,
+       only the prizes that actually exist
+       participate in the random draw.
 
-       Prize 7+ = 0% random chance.
+       Example:
+
+       3 prizes =
+       Prize 1: 50
+       Prize 2: 25
+       Prize 3: 13
+
+       The weights are normalized automatically.
     */
 
     const availableCount =
@@ -1883,7 +1913,10 @@ async function startDraw(){
        SECRET HOST CHOICE
 
        If one exists, the wheel will silently
-       use it. Nothing about the choice is shown.
+       use it.
+
+       It does NOT display the selected person
+       or prize before the wheel spins.
     */
 
     if(hostChoicePending){
@@ -2063,7 +2096,8 @@ function hostChoice(){
     if(hostChoicePending){
 
         /*
-           Do not reveal the existing selection.
+           Do not reveal or change the
+           existing secret selection.
         */
 
         return;
@@ -2119,18 +2153,12 @@ function hostChoice(){
     /*
        STORE ONLY.
 
-       Absolutely nothing visible changes.
+       Nothing is revealed.
 
-       No status change.
-       No button change.
-       No yellow color.
-       No alert containing the selection.
-       No winner display.
-       No name display.
-       No prize display.
-
-       The selected values stay secret until
-       the next normal-looking wheel spin.
+       The next main SPIN THE WHEEL action
+       will land on this participant and
+       reveal this prize only after the wheel
+       has stopped.
     */
 
     hostChoicePending = {
@@ -2142,11 +2170,9 @@ function hostChoice(){
     };
 
     /*
-       Keep the interface looking completely normal.
-
-       We also clear the dropdowns so there is no
-       visible selected participant/prize after
-       USE HOST CHOICE is pressed.
+       Clear the dropdowns so the selected
+       participant and prize are not visibly
+       sitting in the Host Choice controls.
     */
 
     hostParticipant.value = "";
@@ -2182,13 +2208,6 @@ async function executeHostChoiceSpin(){
             p => p.id === selectedPrizeId
         );
 
-    /*
-       If the selected participant or prize
-       no longer exists, silently cancel
-       the secret selection and tell the host
-       only that it is no longer available.
-    */
-
     if(!person || !prize){
 
         hostChoicePending = null;
@@ -2218,16 +2237,6 @@ async function executeHostChoiceSpin(){
 
     hostButton.disabled = true;
 
-    /*
-       IMPORTANT:
-
-       We deliberately use the normal
-       SPINNING status.
-
-       Nothing on screen reveals that this
-       is a Host Choice.
-    */
-
     statusEl.textContent =
         "SPINNING";
 
@@ -2236,23 +2245,14 @@ async function executeHostChoiceSpin(){
 
     hideWinner();
 
-    /*
-       Small natural pause before spinning.
-    */
-
     await sleep(300);
-
-    /*
-       Spin to the secretly selected participant.
-    */
 
     await spinWheelToIndex(
         winnerIndex
     );
 
     /*
-       Only after the wheel has stopped do we
-       reveal the selected winner and prize.
+       Reveal only after the wheel has stopped.
     */
 
     showWinner(
@@ -2267,7 +2267,7 @@ async function executeHostChoiceSpin(){
     );
 
     /*
-       Remove the participant.
+       Remove participant.
 
        Prize remains available.
     */
@@ -2288,9 +2288,10 @@ async function executeHostChoiceSpin(){
     drawWheel();
 
     /*
-       Clear the secret selection immediately.
+       Clear the secret selection.
 
-       Any later spin is completely random again.
+       Every later spin returns to normal
+       random participant + random prize.
     */
 
     hostChoicePending = null;
@@ -2329,11 +2330,6 @@ function cancelHostChoice(){
     hostParticipant.value = "";
 
     hostPrize.value = "";
-
-    /*
-       Nothing else changes because Host Choice
-       has no visible active state.
-    */
 
     if(!drawing){
 
@@ -2393,8 +2389,9 @@ function spinWheelToIndex(index){
             /*
                COMPLETE rotations only.
 
-               This keeps the final segment aligned
-               exactly with the pointer.
+               No random fractional angle is added.
+               This keeps the final segment exactly
+               aligned with the pointer.
             */
 
             const fullSpins =
@@ -2532,11 +2529,6 @@ function updateHostParticipants(){
 
     }
 
-    /*
-       If the secret selection disappears,
-       cancel it silently.
-    */
-
     if(hostChoicePending){
 
         if(
@@ -2594,11 +2586,6 @@ function updateHostPrizes(){
             currentValue;
 
     }
-
-    /*
-       If the secret selection disappears,
-       cancel it silently.
-    */
 
     if(hostChoicePending){
 
