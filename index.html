@@ -1681,11 +1681,6 @@ function drawWheel(){
                 fontSize = 17;
         }
 
-        /*
-           Keep very long names readable without
-           making them tiny.
-        */
-
         const maxWidth =
             radius * 0.68;
 
@@ -1694,11 +1689,6 @@ function drawWheel(){
 
         ctx.font =
             `900 ${fontSize}px Arial, Helvetica, sans-serif`;
-
-        /*
-           Shorten only when the name physically
-           cannot fit in the wheel segment.
-        */
 
         while(
             ctx.measureText(displayName).width >
@@ -1713,8 +1703,6 @@ function drawWheel(){
                 ) + "…";
 
         }
-
-        /* Extra bold outline */
 
         ctx.font =
             `900 ${fontSize}px Arial, Helvetica, sans-serif`;
@@ -1778,6 +1766,114 @@ function drawWheel(){
 }
 
 /* ============================================================
+   RANDOM PRIZE SELECTION
+============================================================ */
+
+/*
+    RANDOM PRIZE RARITY
+
+    Prize 1 = Very Common
+    Prize 2 = Less Common
+    Prize 3 = Rare
+    Prize 4 = Very Rare
+    Prize 5 = Extremely Rare
+    Prize 6 = Ultimately Rare
+
+    IMPORTANT:
+    Prize 7 and every prize after Prize 7
+    have ZERO chance of being selected here.
+
+    They are ONLY available through Host Choice.
+
+    The weights below are relative weights:
+
+    Prize 1 = 40
+    Prize 2 = 25
+    Prize 3 = 15
+    Prize 4 = 10
+    Prize 5 = 6
+    Prize 6 = 4
+
+    When fewer than 6 prizes exist, the available
+    prizes share the available weight and therefore
+    the percentages are automatically normalized.
+*/
+
+function chooseRandomPrize(){
+
+    if(!prizes.length)
+        return null;
+
+    const weights = [
+        40,
+        25,
+        15,
+        10,
+        6,
+        4
+    ];
+
+    /*
+       NEVER include Prize 7+.
+
+       Only Prize 1 through Prize 6
+       can enter this random selection.
+    */
+
+    const availableCount =
+        Math.min(
+            prizes.length,
+            6
+        );
+
+    const availableWeights =
+        weights.slice(
+            0,
+            availableCount
+        );
+
+    const totalWeight =
+        availableWeights.reduce(
+            function(sum,weight){
+
+                return sum + weight;
+
+            },
+            0
+        );
+
+    let random =
+        Math.random() *
+        totalWeight;
+
+    for(
+        let i=0;
+        i<availableCount;
+        i++
+    ){
+
+        random -=
+            availableWeights[i];
+
+        if(random < 0){
+
+            return prizes[i];
+
+        }
+    }
+
+    /*
+       Safety fallback.
+       This can ONLY return one of
+       Prize 1 through Prize 6.
+    */
+
+    return prizes[
+        availableCount - 1
+    ];
+}
+
+/* ============================================================
    START RANDOM DRAW - LONGER SUSPENSE + STAY OPEN
 ============================================================ */
 
@@ -1804,6 +1900,29 @@ async function startDraw(){
         return;
     }
 
+    /*
+       If there are only Prize 7+ items and
+       no Prize 1-6 exists, normal random draw
+       cannot select a prize.
+    */
+
+    if(
+        !prizes.some(
+            function(prize,index){
+
+                return index < 6;
+
+            }
+        )
+    ){
+
+        alert(
+            "Normal random draw only uses Prize 1 to Prize 6. Prize 7 and above can only be selected with Host Choice."
+        );
+
+        return;
+    }
+
     const count =
         Number(
             winnerCount.value
@@ -1820,13 +1939,6 @@ async function startDraw(){
 
         return;
     }
-
-    /*
-       IMPORTANT:
-       Prizes are NOT removed after a winner.
-       Therefore the same prize can remain available
-       in the prize list for future selections.
-    */
 
     drawing = true;
 
@@ -1849,10 +1961,13 @@ async function startDraw(){
     ){
 
         if(
-            participants.length === 0 ||
-            prizes.length === 0
+            participants.length === 0
         )
             break;
+
+        /*
+           Select participant randomly.
+        */
 
         const winnerIndex =
             Math.floor(
@@ -1865,16 +1980,39 @@ async function startDraw(){
                 winnerIndex
             ];
 
-        const prizeIndex =
-            Math.floor(
-                Math.random() *
-                prizes.length
-            );
+        /*
+           Select prize using the rarity system.
+
+           IMPORTANT:
+           This function can ONLY return
+           Prize 1 through Prize 6.
+
+           Prize 7+ is completely excluded.
+        */
 
         const prize =
-            prizes[
-                prizeIndex
-            ];
+            chooseRandomPrize();
+
+        if(!prize){
+
+            drawing = false;
+
+            startBtn.disabled = false;
+
+            hostButton.disabled = false;
+
+            statusEl.textContent =
+                "READY";
+
+            statusEl.style.color =
+                "#28e07b";
+
+            alert(
+                "No random prize from Prize 1 to Prize 6 is available."
+            );
+
+            return;
+        }
 
         await spinWheelToIndex(
             winnerIndex
@@ -1892,8 +2030,12 @@ async function startDraw(){
         );
 
         /*
-           Participant is still removed after winning.
-           Prize is intentionally NOT removed.
+           Participant is removed after winning.
+
+           Prize is NOT removed.
+
+           This means the same Prize 1-6 can
+           appear again in future random draws.
         */
 
         participants.splice(
@@ -1902,10 +2044,6 @@ async function startDraw(){
         );
 
         renderParticipants();
-
-        /*
-           Keep the prize list exactly as it is.
-        */
 
         renderPrizes();
 
@@ -2197,6 +2335,10 @@ async function hostChoice(){
 
     /*
        Prize is intentionally NOT removed.
+
+       Host Choice can select ANY prize,
+       including Prize 7, Prize 8, Prize 9,
+       and so on.
     */
 
     renderParticipants();
