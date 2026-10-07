@@ -1441,7 +1441,7 @@ function clearPrizes(){
 }
 
 /* ============================================================
-   DRAW WHEEL - IMPROVED BOLDER TEXT
+   DRAW WHEEL - BIGGER PARTICIPANT NAMES
 ============================================================ */
 
 function drawWheel(){
@@ -1576,7 +1576,9 @@ function drawWheel(){
 
         ctx.stroke();
 
-        /* NAME - BOLDER & SMARTER */
+        /* ============================================
+           BIGGER NAME TEXT
+        ============================================ */
 
         ctx.save();
 
@@ -1595,33 +1597,160 @@ function drawWheel(){
         ctx.textBaseline =
             "middle";
 
+        const name =
+            participants[i].name;
+
+        const nameLength =
+            name.length;
+
+        /*
+           The text is intentionally much larger
+           than before.
+
+           Short names get the biggest text.
+           Longer names are reduced slightly so
+           they still fit inside their section.
+        */
+
         let fontSize;
-        if(total > 25) fontSize = 16;
-        else if(total > 18) fontSize = 19;
-        else if(total > 12) fontSize = 22;
-        else if(total > 8) fontSize = 26;
-        else if(total > 4) fontSize = 30;
-        else fontSize = 34;
 
-        let name = participants[i].name;
+        if(total <= 4){
 
-        // smarter truncation based on count
-        let maxLen = total > 15? 14 : total > 8? 18 : 22;
-        if(name.length > maxLen){
-            name = name.substring(0, maxLen-1)+"…";
+            if(nameLength <= 7)
+                fontSize = 58;
+            else if(nameLength <= 11)
+                fontSize = 50;
+            else if(nameLength <= 16)
+                fontSize = 43;
+            else
+                fontSize = 36;
+
+        }else if(total <= 6){
+
+            if(nameLength <= 7)
+                fontSize = 50;
+            else if(nameLength <= 11)
+                fontSize = 43;
+            else if(nameLength <= 16)
+                fontSize = 36;
+            else
+                fontSize = 30;
+
+        }else if(total <= 8){
+
+            if(nameLength <= 7)
+                fontSize = 43;
+            else if(nameLength <= 11)
+                fontSize = 37;
+            else if(nameLength <= 16)
+                fontSize = 32;
+            else
+                fontSize = 27;
+
+        }else if(total <= 12){
+
+            if(nameLength <= 7)
+                fontSize = 36;
+            else if(nameLength <= 11)
+                fontSize = 31;
+            else if(nameLength <= 16)
+                fontSize = 27;
+            else
+                fontSize = 23;
+
+        }else if(total <= 18){
+
+            if(nameLength <= 7)
+                fontSize = 30;
+            else if(nameLength <= 11)
+                fontSize = 26;
+            else if(nameLength <= 16)
+                fontSize = 23;
+            else
+                fontSize = 20;
+
+        }else{
+
+            if(nameLength <= 7)
+                fontSize = 25;
+            else if(nameLength <= 11)
+                fontSize = 22;
+            else if(nameLength <= 16)
+                fontSize = 19;
+            else
+                fontSize = 17;
         }
 
-        // extra bold + outline for clarity
-        ctx.font = `900 ${fontSize}px Arial, Helvetica, sans-serif`;
-        ctx.lineJoin = "round";
-        ctx.strokeStyle = "rgba(0,0,0,0.85)";
-        ctx.lineWidth = fontSize * 0.22;
-        ctx.strokeText(name, radius-28, 0);
+        /*
+           Keep very long names readable without
+           making them tiny.
+        */
 
-        ctx.fillStyle = "#fff";
-        ctx.shadowColor = "rgba(0,0,0,.8)";
-        ctx.shadowBlur = 8;
-        ctx.fillText(name, radius-28, 0);
+        const maxWidth =
+            radius * 0.68;
+
+        let displayName =
+            name;
+
+        ctx.font =
+            `900 ${fontSize}px Arial, Helvetica, sans-serif`;
+
+        /*
+           Shorten only when the name physically
+           cannot fit in the wheel segment.
+        */
+
+        while(
+            ctx.measureText(displayName).width >
+            maxWidth &&
+            displayName.length > 4
+        ){
+
+            displayName =
+                displayName.substring(
+                    0,
+                    displayName.length-2
+                ) + "…";
+
+        }
+
+        /* Extra bold outline */
+
+        ctx.font =
+            `900 ${fontSize}px Arial, Helvetica, sans-serif`;
+
+        ctx.lineJoin =
+            "round";
+
+        ctx.strokeStyle =
+            "rgba(0,0,0,0.9)";
+
+        ctx.lineWidth =
+            Math.max(
+                5,
+                fontSize * 0.18
+            );
+
+        ctx.strokeText(
+            displayName,
+            radius-22,
+            0
+        );
+
+        ctx.fillStyle =
+            "#fff";
+
+        ctx.shadowColor =
+            "rgba(0,0,0,.9)";
+
+        ctx.shadowBlur =
+            8;
+
+        ctx.fillText(
+            displayName,
+            radius-22,
+            0
+        );
 
         ctx.restore();
     }
@@ -1692,17 +1821,12 @@ async function startDraw(){
         return;
     }
 
-    if(
-        count >
-        prizes.length
-    ){
-
-        alert(
-            "There are not enough prizes."
-        );
-
-        return;
-    }
+    /*
+       IMPORTANT:
+       Prizes are NOT removed after a winner.
+       Therefore the same prize can remain available
+       in the prize list for future selections.
+    */
 
     drawing = true;
 
@@ -1716,7 +1840,6 @@ async function startDraw(){
     statusEl.style.color =
         "#ffd54a";
 
-    // ensure overlay hidden at start
     hideWinner();
 
     for(
@@ -1768,17 +1891,21 @@ async function startDraw(){
             "Fair Random"
         );
 
+        /*
+           Participant is still removed after winning.
+           Prize is intentionally NOT removed.
+        */
+
         participants.splice(
             winnerIndex,
             1
         );
 
-        prizes.splice(
-            prizeIndex,
-            1
-        );
-
         renderParticipants();
+
+        /*
+           Keep the prize list exactly as it is.
+        */
 
         renderPrizes();
 
@@ -1789,12 +1916,13 @@ async function startDraw(){
         drawWheel();
 
         if(i < count - 1){
-            // if multiple winners, wait then auto close to spin next
+
             await sleep(3800);
+
             hideWinner();
+
             await sleep(900);
         }
-        // last winner stays open - will close only when typing new names
     }
 
     drawing = false;
@@ -1836,7 +1964,8 @@ function spinWheelToIndex(index){
                 segmentCenter;
 
             const extra =
-                360*10 + Math.random()*360;
+                360*10 +
+                Math.random()*360;
 
             wheelRotation +=
                 extra + target;
@@ -1881,24 +2010,56 @@ function hideWinner(){
     );
 }
 
-// NEW: Close winner when you start typing new names + click overlay
-participantInput.addEventListener("input", function(){
-    if(winnerOverlay.classList.contains("show")){
-        hideWinner();
+participantInput.addEventListener(
+    "input",
+    function(){
+
+        if(
+            winnerOverlay.classList.contains(
+                "show"
+            )
+        ){
+
+            hideWinner();
+
+        }
+
     }
-});
-participantInput.addEventListener("focus", function(){
-    if(winnerOverlay.classList.contains("show")){
-        // small delay so you can see it's intentional
-        // hide on focus after 250ms if user intends to type
-        setTimeout(()=> {
-            if(document.activeElement === participantInput){
-                // don't auto hide on just focus, only on input - keep for UX
-            }
-        },250);
+);
+
+participantInput.addEventListener(
+    "focus",
+    function(){
+
+        if(
+            winnerOverlay.classList.contains(
+                "show"
+            )
+        ){
+
+            setTimeout(
+                () => {
+
+                    if(
+                        document.activeElement ===
+                        participantInput
+                    ){
+
+                    }
+
+                },
+                250
+            );
+
+        }
+
     }
-});
-winnerOverlay.addEventListener("click", hideWinner);
+);
+
+winnerOverlay.addEventListener(
+    "click",
+    hideWinner
+);
 
 /* ============================================================
    HOST CHOICE
@@ -2001,7 +2162,7 @@ async function hostChoice(){
             p => p.id === prizeId
         );
 
-    if(!person ||!prize)
+    if(!person || !prize)
         return;
 
     drawing = true;
@@ -2031,13 +2192,12 @@ async function hostChoice(){
 
     participants =
         participants.filter(
-            p => p.id!== person.id
+            p => p.id !== person.id
         );
 
-    prizes =
-        prizes.filter(
-            p => p.id!== prize.id
-        );
+    /*
+       Prize is intentionally NOT removed.
+    */
 
     renderParticipants();
 
@@ -2051,7 +2211,6 @@ async function hostChoice(){
 
     saveData();
 
-    // stays open until you type new name or click winner
     drawing = false;
 
     startBtn.disabled = false;
@@ -2213,8 +2372,10 @@ function celebrate(){
             ];
 
         piece.style.animationDuration =
-            (2+
-            Math.random()*3)+
+            (
+                2+
+                Math.random()*3
+            )+
             "s";
 
         document.body.appendChild(
@@ -2252,6 +2413,7 @@ function saveData(show=false){
         alert(
             "Your data has been saved."
         );
+
     }
 }
 
@@ -2364,6 +2526,7 @@ function uid(){
     ){
 
         return crypto.randomUUID();
+
     }
 
     return (
@@ -2409,7 +2572,9 @@ participantInput.addEventListener(
     function(e){
 
         if(e.key==="Enter"){
+
             addParticipant();
+
         }
 
     }
@@ -2420,7 +2585,9 @@ prizeInput.addEventListener(
     function(e){
 
         if(e.key==="Enter"){
+
             addPrize();
+
         }
 
     }
