@@ -2,704 +2,680 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prize Winner App</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Prize Wheel</title>
 
 <style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
 }
 
-:root {
-    --bg: #060606;
-    --card: #101010;
-    --card2: #171717;
-    --red: #ff1744;
-    --red-dark: #a9002d;
-    --gold: #ffd54a;
-    --green: #20df78;
-    --blue: #4da3ff;
-    --white: #fff;
-    --muted: #929292;
-    --border: rgba(255,255,255,.09);
+:root{
+    --bg:#050505;
+    --card:#101010;
+    --card2:#171717;
+    --red:#ff1744;
+    --red2:#a9002d;
+    --gold:#ffd54a;
+    --white:#fff;
+    --muted:#888;
+    --border:rgba(255,255,255,.09);
 }
 
-html {
-    scroll-behavior: smooth;
-}
-
-body {
-    font-family: Arial, Helvetica, sans-serif;
-    color: var(--white);
-    min-height: 100vh;
+body{
+    min-height:100vh;
+    font-family:Arial,Helvetica,sans-serif;
+    color:white;
     background:
-        radial-gradient(circle at 50% -10%, rgba(255, 23, 68, .18), transparent 35%),
-        radial-gradient(circle at 100% 100%, rgba(255, 213, 74, .06), transparent 30%),
-        var(--bg);
+        radial-gradient(circle at 50% 0%,rgba(255,23,68,.17),transparent 35%),
+        radial-gradient(circle at 100% 100%,rgba(255,213,74,.06),transparent 30%),
+        #050505;
 }
 
-button,
-input,
-select {
-    font: inherit;
+button,input,select{
+    font:inherit;
 }
 
-button {
-    cursor: pointer;
+button{
+    cursor:pointer;
 }
 
-button:disabled {
-    cursor: not-allowed;
-}
-
-.app {
-    width: 100%;
-    max-width: 1450px;
-    margin: auto;
-    padding: 20px;
+.app{
+    width:100%;
+    max-width:1450px;
+    margin:auto;
+    padding:18px;
 }
 
 /* HEADER */
 
-.header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 15px;
-    margin-bottom: 20px;
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+    margin-bottom:18px;
 }
 
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+.logo{
+    display:flex;
+    align-items:center;
+    gap:12px;
 }
 
-.logo-icon {
-    width: 50px;
-    height: 50px;
-    display: grid;
-    place-items: center;
-    border-radius: 15px;
-    background: linear-gradient(135deg, #ff1744, #8c0027);
-    box-shadow: 0 0 30px rgba(255,23,68,.3);
-    font-size: 25px;
+.logoIcon{
+    width:50px;
+    height:50px;
+    border-radius:15px;
+    display:grid;
+    place-items:center;
+    font-size:25px;
+    background:linear-gradient(135deg,#ff1744,#8c0027);
+    box-shadow:0 0 30px rgba(255,23,68,.3);
 }
 
-.logo h1 {
-    font-size: 22px;
+.logo h1{
+    font-size:22px;
 }
 
-.logo p {
-    color: var(--muted);
-    font-size: 12px;
-    margin-top: 3px;
+.logo p{
+    color:#888;
+    font-size:11px;
+    margin-top:3px;
 }
 
-.header-buttons {
-    display: flex;
-    gap: 8px;
+.headerButtons{
+    display:flex;
+    gap:7px;
 }
 
-/* BUTTONS */
-
-.btn {
-    border: 1px solid var(--border);
-    background: #151515;
-    color: white;
-    padding: 10px 14px;
-    border-radius: 10px;
-    transition: .2s;
+.btn{
+    border:1px solid var(--border);
+    background:#151515;
+    color:white;
+    padding:10px 14px;
+    border-radius:10px;
 }
 
-.btn:hover {
-    background: #202020;
-    transform: translateY(-1px);
+.btn:hover{
+    background:#222;
 }
 
-.btn-red {
-    background: rgba(255,23,68,.1);
-    border-color: rgba(255,23,68,.3);
-    color: #ff6b87;
+.danger{
+    color:#ff6884;
+    background:rgba(255,23,68,.08);
 }
 
-.btn-primary {
-    border: none;
-    background: linear-gradient(135deg, var(--red), var(--red-dark));
-    color: white;
-    font-weight: bold;
+/* LAYOUT */
+
+.layout{
+    display:grid;
+    grid-template-columns:290px minmax(450px,1fr) 290px;
+    gap:17px;
 }
 
-.btn-gold {
-    border: none;
-    background: linear-gradient(135deg, #ffd54a, #d99900);
-    color: #211900;
-    font-weight: bold;
+.card{
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:17px;
+    background:linear-gradient(
+        145deg,
+        rgba(255,255,255,.045),
+        rgba(255,255,255,.01)
+    );
+    box-shadow:0 15px 50px rgba(0,0,0,.25);
 }
 
-/* MAIN */
-
-.main-grid {
-    display: grid;
-    grid-template-columns: 310px minmax(400px, 1fr) 310px;
-    gap: 18px;
+.cardTitle{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
 }
 
-.card {
-    background:
-        linear-gradient(145deg, rgba(255,255,255,.045), rgba(255,255,255,.012));
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 18px;
-    box-shadow: 0 18px 50px rgba(0,0,0,.25);
-    backdrop-filter: blur(10px);
+.cardTitle h2{
+    font-size:16px;
 }
 
-.card-title {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 15px;
-}
-
-.card-title h2 {
-    font-size: 16px;
-}
-
-.count {
-    background: #252525;
-    color: #aaa;
-    padding: 4px 9px;
-    border-radius: 20px;
-    font-size: 11px;
+.count{
+    padding:4px 9px;
+    border-radius:20px;
+    background:#252525;
+    color:#999;
+    font-size:10px;
 }
 
 /* INPUT */
 
-.input-row {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 13px;
+.inputRow{
+    display:flex;
+    gap:7px;
+    margin-bottom:12px;
 }
 
-input,
-select {
-    width: 100%;
-    border: 1px solid #292929;
-    outline: none;
-    background: #0b0b0b;
-    color: white;
-    padding: 12px;
-    border-radius: 10px;
+input,select{
+    width:100%;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid #292929;
+    background:#090909;
+    color:white;
+    outline:none;
 }
 
-input:focus,
-select:focus {
-    border-color: var(--red);
-    box-shadow: 0 0 0 3px rgba(255,23,68,.08);
+input:focus,select:focus{
+    border-color:var(--red);
 }
 
-.add-button {
-    width: 46px;
-    min-width: 46px;
-    border: none;
-    border-radius: 10px;
-    background: var(--red);
-    color: white;
-    font-size: 23px;
+.addBtn{
+    width:45px;
+    min-width:45px;
+    border:none;
+    border-radius:10px;
+    background:var(--red);
+    color:white;
+    font-size:22px;
 }
 
 /* LIST */
 
-.list {
-    max-height: 430px;
-    overflow-y: auto;
+.list{
+    max-height:450px;
+    overflow-y:auto;
 }
 
-.list::-webkit-scrollbar,
-.history::-webkit-scrollbar {
-    width: 4px;
+.listItem{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    padding:10px;
+    margin-bottom:7px;
+    border-radius:10px;
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.05);
 }
 
-.list::-webkit-scrollbar-thumb,
-.history::-webkit-scrollbar-thumb {
-    background: #333;
-    border-radius: 10px;
+.itemText{
+    min-width:0;
 }
 
-.list-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    padding: 10px;
-    margin-bottom: 7px;
-    border: 1px solid rgba(255,255,255,.055);
-    background: rgba(255,255,255,.035);
-    border-radius: 10px;
+.itemName{
+    font-size:13px;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
 }
 
-.item-text {
-    min-width: 0;
+.itemMeta{
+    color:#777;
+    font-size:9px;
+    margin-top:4px;
 }
 
-.item-name {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    font-size: 13px;
+.removeBtn{
+    width:27px;
+    height:27px;
+    border:0;
+    border-radius:7px;
+    color:#ff5878;
+    background:rgba(255,23,68,.12);
 }
 
-.item-meta {
-    color: var(--muted);
-    font-size: 10px;
-    margin-top: 3px;
+.empty{
+    text-align:center;
+    color:#5e5e5e;
+    padding:35px 10px;
+    font-size:12px;
 }
 
-.remove-button {
-    width: 27px;
-    height: 27px;
-    min-width: 27px;
-    border: none;
-    border-radius: 7px;
-    background: rgba(255,23,68,.12);
-    color: #ff5b78;
+/* WHEEL */
+
+.wheelCard{
+    min-height:650px;
+    display:flex;
+    flex-direction:column;
 }
 
-.empty {
-    color: #606060;
-    text-align: center;
-    padding: 35px 10px;
-    font-size: 13px;
+.wheelHeader{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:12px;
 }
 
-/* DRAW AREA */
-
-.draw-card {
-    min-height: 650px;
-    display: flex;
-    flex-direction: column;
+.status{
+    font-size:9px;
+    letter-spacing:1px;
+    padding:7px 10px;
+    border-radius:20px;
+    color:#28e07b;
+    background:rgba(40,224,123,.09);
 }
 
-.draw-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-}
-
-.draw-header h2 {
-    font-size: 18px;
-}
-
-.status {
-    padding: 7px 11px;
-    border-radius: 20px;
-    font-size: 10px;
-    letter-spacing: .5px;
-    color: var(--green);
-    background: rgba(32,223,120,.1);
-}
-
-.display {
-    flex: 1;
-    min-height: 440px;
-    position: relative;
-    overflow: hidden;
-    border-radius: 20px;
-    border: 1px solid rgba(255,255,255,.08);
+.wheelArea{
+    position:relative;
+    flex:1;
+    min-height:500px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    border-radius:20px;
     background:
-        radial-gradient(circle at center, rgba(255,23,68,.15), transparent 36%),
+        radial-gradient(circle,rgba(255,23,68,.13),transparent 45%),
         #080808;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
+    border:1px solid rgba(255,255,255,.07);
 }
 
-.display::before,
-.display::after {
-    content: "";
-    position: absolute;
-    border-radius: 50%;
-    border: 1px solid rgba(255,23,68,.08);
-    pointer-events: none;
+/* POINTER */
+
+.pointer{
+    position:absolute;
+    top:13px;
+    left:50%;
+    transform:translateX(-50%);
+    width:0;
+    height:0;
+    border-left:18px solid transparent;
+    border-right:18px solid transparent;
+    border-top:34px solid #ffd54a;
+    filter:drop-shadow(0 0 9px rgba(255,213,74,.7));
+    z-index:20;
 }
 
-.display::before {
-    width: 350px;
-    height: 350px;
+/* WHEEL */
+
+.wheelOuter{
+    position:relative;
+    width:min(470px,82vw);
+    height:min(470px,82vw);
+    display:grid;
+    place-items:center;
 }
 
-.display::after {
-    width: 570px;
-    height: 570px;
+#wheelCanvas{
+    width:100%;
+    height:100%;
+    border-radius:50%;
+    transform:rotate(0deg);
+    transition:transform 5.5s cubic-bezier(.12,.72,.08,1);
+    box-shadow:
+        0 0 0 8px #1b1b1b,
+        0 0 0 11px #ffd54a,
+        0 20px 60px rgba(0,0,0,.5);
 }
 
-.display-label {
-    position: relative;
-    z-index: 2;
-    color: #858585;
-    text-transform: uppercase;
-    font-size: 10px;
-    letter-spacing: 4px;
-    margin-bottom: 15px;
+/* CENTER */
+
+.wheelCenter{
+    position:absolute;
+    width:90px;
+    height:90px;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    text-align:center;
+    background:
+        radial-gradient(circle,#ff4569,#980027);
+    border:5px solid #ffd54a;
+    box-shadow:0 0 25px rgba(255,23,68,.5);
+    z-index:10;
+    font-size:11px;
+    font-weight:bold;
 }
 
-.draw-name {
-    position: relative;
-    z-index: 2;
-    max-width: 90%;
-    text-align: center;
-    word-break: break-word;
-    font-size: clamp(35px, 6vw, 72px);
-    line-height: 1.05;
-    font-weight: 900;
-    text-shadow: 0 0 35px rgba(255,23,68,.5);
+/* WINNER */
+
+.winnerOverlay{
+    position:absolute;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    background:rgba(0,0,0,.82);
+    backdrop-filter:blur(8px);
+    z-index:50;
+    text-align:center;
 }
 
-.draw-prize {
-    position: relative;
-    z-index: 2;
-    margin-top: 20px;
-    max-width: 90%;
-    text-align: center;
-    color: var(--gold);
-    font-size: clamp(19px, 3vw, 32px);
-    font-weight: bold;
+.winnerOverlay.show{
+    display:flex;
+    animation:overlayIn .4s ease;
 }
 
-.spinning {
-    animation: spinPulse .12s infinite alternate;
-}
-
-@keyframes spinPulse {
-    from {
-        transform: scale(.96);
-        opacity: .55;
+@keyframes overlayIn{
+    from{
+        opacity:0;
     }
-
-    to {
-        transform: scale(1.05);
-        opacity: 1;
-    }
-}
-
-.reveal {
-    animation: reveal .8s ease;
-}
-
-@keyframes reveal {
-    0% {
-        transform: scale(.45);
-        opacity: 0;
-    }
-
-    60% {
-        transform: scale(1.13);
-        opacity: 1;
-    }
-
-    100% {
-        transform: scale(1);
+    to{
+        opacity:1;
     }
 }
 
-/* DRAW SETTINGS */
-
-.draw-settings {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 10px;
-    margin-top: 14px;
+.winnerEmoji{
+    font-size:60px;
+    animation:bounce .8s ease infinite alternate;
 }
 
-.setting label {
-    display: block;
-    color: var(--muted);
-    font-size: 10px;
-    margin-bottom: 6px;
+@keyframes bounce{
+    from{transform:scale(.9)}
+    to{transform:scale(1.1)}
 }
 
-.start-button {
-    width: 100%;
-    height: 58px;
-    border: none;
-    border-radius: 13px;
-    margin-top: 12px;
-    background: linear-gradient(135deg, var(--red), #9c0028);
-    color: white;
-    font-size: 16px;
-    font-weight: 800;
-    box-shadow: 0 8px 25px rgba(255,23,68,.15);
+.winnerTitle{
+    color:#ffd54a;
+    font-size:11px;
+    letter-spacing:4px;
+    margin:8px 0;
 }
 
-/* RARITY GUIDE */
-
-.rarity-guide {
-    margin-top: 18px;
+.winnerName{
+    font-size:clamp(30px,6vw,65px);
+    font-weight:900;
 }
 
-.rarity-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 8px;
+.winnerPrize{
+    margin-top:10px;
+    color:#ffd54a;
+    font-size:20px;
+    font-weight:bold;
 }
 
-.rarity {
-    text-align: center;
-    padding: 10px 5px;
-    background: rgba(255,255,255,.035);
-    border: 1px solid rgba(255,255,255,.06);
-    border-radius: 9px;
+/* CONTROLS */
+
+.controls{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:9px;
+    margin-top:13px;
 }
 
-.rarity-number {
-    font-size: 15px;
-    font-weight: bold;
+.startBtn{
+    height:57px;
+    border:none;
+    border-radius:12px;
+    color:white;
+    font-size:16px;
+    font-weight:900;
+    background:linear-gradient(135deg,#ff1744,#970028);
+    box-shadow:0 10px 30px rgba(255,23,68,.16);
 }
 
-.rarity-name {
-    color: #999;
-    font-size: 9px;
-    margin-top: 4px;
+.startBtn:disabled{
+    opacity:.45;
+}
+
+.winnerCountLabel{
+    color:#888;
+    font-size:10px;
+    margin-bottom:5px;
+}
+
+/* PRIZES */
+
+.prizeGallery{
+    margin-top:15px;
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:8px;
+    max-height:280px;
+    overflow-y:auto;
+}
+
+.prizeCard{
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:11px;
+    overflow:hidden;
+    background:#0c0c0c;
+}
+
+.prizeImage{
+    width:100%;
+    height:85px;
+    object-fit:cover;
+    display:block;
+    background:#171717;
+}
+
+.prizeNoImage{
+    height:85px;
+    display:grid;
+    place-items:center;
+    font-size:25px;
+    background:#151515;
+}
+
+.prizeInfo{
+    padding:8px;
+}
+
+.prizeName{
+    font-size:11px;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+}
+
+.prizePosition{
+    color:#777;
+    font-size:8px;
+    margin-top:3px;
+}
+
+.uploadLabel{
+    display:block;
+    padding:9px;
+    border-radius:9px;
+    background:#151515;
+    color:#aaa;
+    text-align:center;
+    font-size:10px;
+    cursor:pointer;
+    margin-top:8px;
+}
+
+.uploadLabel:hover{
+    background:#222;
+}
+
+input[type=file]{
+    display:none;
 }
 
 /* HISTORY */
 
-.history-card {
-    margin-top: 18px;
+.historyCard{
+    margin-top:17px;
 }
 
-.history {
-    max-height: 420px;
-    overflow-y: auto;
+.history{
+    max-height:400px;
+    overflow-y:auto;
 }
 
-.history-item {
-    display: flex;
-    align-items: center;
-    gap: 13px;
-    padding: 13px;
-    margin-bottom: 8px;
-    border: 1px solid rgba(255,255,255,.055);
-    border-radius: 11px;
-    background: rgba(255,255,255,.03);
+.historyItem{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    padding:12px;
+    border-radius:11px;
+    background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.05);
+    margin-bottom:7px;
 }
 
-.history-number {
-    width: 32px;
-    height: 32px;
-    display: grid;
-    place-items: center;
-    border-radius: 9px;
-    background: rgba(255,23,68,.12);
-    color: #ff5576;
-    font-weight: bold;
+.historyNumber{
+    width:32px;
+    height:32px;
+    border-radius:9px;
+    display:grid;
+    place-items:center;
+    background:rgba(255,23,68,.1);
+    color:#ff6683;
+    font-weight:bold;
 }
 
-.history-content {
-    flex: 1;
+.historyName{
+    font-weight:bold;
+    font-size:13px;
 }
 
-.history-name {
-    font-size: 14px;
-    font-weight: bold;
+.historyPrize{
+    color:#ffd54a;
+    font-size:11px;
+    margin-top:4px;
 }
 
-.history-prize {
-    color: var(--gold);
-    font-size: 12px;
-    margin-top: 4px;
-}
-
-.history-info {
-    color: #777;
-    font-size: 9px;
-    margin-top: 5px;
+.historyMode{
+    color:#666;
+    font-size:9px;
+    margin-top:4px;
 }
 
 /* HOST CHOICE */
 
-.host-card {
-    margin-top: 18px;
-    border-color: rgba(255,213,74,.12);
-    background:
-        linear-gradient(145deg, rgba(255,213,74,.045), rgba(255,255,255,.01));
+.hostCard{
+    margin-top:17px;
+    border-color:rgba(255,213,74,.12);
 }
 
-.host-title {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.hostHeader{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
 
-.host-title h2 {
-    color: var(--gold);
-    font-size: 16px;
+.hostHeader h2{
+    color:#ffd54a;
+    font-size:16px;
 }
 
-.host-badge {
-    font-size: 9px;
-    padding: 6px 9px;
-    border-radius: 20px;
-    background: rgba(255,213,74,.1);
-    color: var(--gold);
+.hostBadge{
+    font-size:9px;
+    padding:6px 9px;
+    border-radius:20px;
+    background:rgba(255,213,74,.1);
+    color:#ffd54a;
 }
 
-.host-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-top: 15px;
+.hostGrid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-top:15px;
 }
 
-.host-field label {
-    display: block;
-    color: #999;
-    font-size: 10px;
-    margin-bottom: 6px;
+.hostGrid label{
+    display:block;
+    color:#888;
+    font-size:9px;
+    margin-bottom:6px;
 }
 
-.host-description {
-    margin-top: 12px;
-    padding: 11px;
-    border-radius: 9px;
-    background: rgba(255,255,255,.025);
-    color: #777;
-    font-size: 11px;
-    line-height: 1.5;
+.hostButton{
+    width:100%;
+    height:53px;
+    margin-top:13px;
+    border:0;
+    border-radius:11px;
+    background:linear-gradient(135deg,#ffd54a,#c58b00);
+    color:#1b1400;
+    font-weight:900;
 }
 
-.host-button {
-    width: 100%;
-    height: 52px;
-    margin-top: 13px;
-    border: none;
-    border-radius: 11px;
-    background: linear-gradient(135deg, #ffd54a, #c98b00);
-    color: #201800;
-    font-weight: 900;
-}
-
-/* PRIZE BADGES */
-
-.badge {
-    display: inline-block;
-    padding: 3px 6px;
-    border-radius: 5px;
-    font-size: 8px;
-    margin-top: 4px;
-}
-
-.common {
-    background: rgba(40,224,123,.1);
-    color: #41e889;
-}
-
-.rare {
-    background: rgba(77,163,255,.1);
-    color: #68b2ff;
-}
-
-.very-rare {
-    background: rgba(180,100,255,.1);
-    color: #c087ff;
-}
-
-.extreme {
-    background: rgba(255,94,94,.1);
-    color: #ff7777;
-}
-
-.ultra {
-    background: rgba(255,213,74,.1);
-    color: var(--gold);
-}
-
-.host-only {
-    background: rgba(255,23,68,.1);
-    color: #ff6885;
+.hostNote{
+    margin-top:11px;
+    color:#666;
+    font-size:10px;
+    line-height:1.5;
 }
 
 /* CONFETTI */
 
-.confetti {
-    position: fixed;
-    top: -20px;
-    width: 8px;
-    height: 14px;
-    z-index: 99999;
-    pointer-events: none;
-    animation: fall linear forwards;
+.confetti{
+    position:fixed;
+    top:-20px;
+    width:8px;
+    height:14px;
+    z-index:99999;
+    pointer-events:none;
+    animation:fall linear forwards;
 }
 
-@keyframes fall {
-    to {
-        transform: translateY(110vh) rotate(720deg);
-        opacity: 0;
+@keyframes fall{
+    to{
+        transform:translateY(110vh) rotate(720deg);
+        opacity:0;
     }
 }
 
 /* MOBILE */
 
-@media(max-width: 1100px) {
+@media(max-width:1100px){
 
-    .main-grid {
-        grid-template-columns: 1fr 1fr;
+    .layout{
+        grid-template-columns:1fr 1fr;
     }
 
-    .draw-card {
-        grid-column: 1 / -1;
-        grid-row: 1;
+    .wheelCard{
+        grid-column:1/-1;
+        grid-row:1;
     }
 }
 
-@media(max-width: 700px) {
+@media(max-width:700px){
 
-    .app {
-        padding: 12px;
+    .app{
+        padding:10px;
     }
 
-    .header {
-        align-items: flex-start;
+    .header{
+        align-items:flex-start;
     }
 
-    .logo h1 {
-        font-size: 18px;
+    .logo h1{
+        font-size:18px;
     }
 
-    .logo p {
-        font-size: 10px;
+    .logo p{
+        font-size:9px;
     }
 
-    .header-buttons .btn {
-        padding: 8px;
-        font-size: 10px;
+    .headerButtons .btn{
+        padding:8px;
+        font-size:9px;
     }
 
-    .main-grid {
-        display: flex;
-        flex-direction: column;
+    .layout{
+        display:flex;
+        flex-direction:column;
     }
 
-    .draw-card {
-        order: -1;
-        min-height: auto;
+    .wheelCard{
+        order:-1;
+        min-height:auto;
     }
 
-    .display {
-        min-height: 390px;
+    .wheelArea{
+        min-height:450px;
     }
 
-    .rarity-grid {
-        grid-template-columns: repeat(3, 1fr);
+    .wheelCenter{
+        width:70px;
+        height:70px;
+        font-size:9px;
     }
 
-    .host-grid {
-        grid-template-columns: 1fr;
+    .hostGrid{
+        grid-template-columns:1fr;
+    }
+
+    .prizeGallery{
+        grid-template-columns:repeat(2,1fr);
     }
 }
 </style>
@@ -709,357 +685,378 @@ select:focus {
 
 <div class="app">
 
-    <!-- HEADER -->
+<!-- HEADER -->
 
-    <header class="header">
+<header class="header">
 
-        <div class="logo">
+    <div class="logo">
 
-            <div class="logo-icon">🏆</div>
+        <div class="logoIcon">
+            🎡
+        </div>
 
-            <div>
-                <h1>Prize Winner</h1>
-                <p>Professional Giveaway Selector</p>
+        <div>
+            <h1>Prize Wheel</h1>
+            <p>Professional Giveaway Selector</p>
+        </div>
+
+    </div>
+
+    <div class="headerButtons">
+
+        <button
+            class="btn"
+            onclick="saveData(true)"
+        >
+            💾 Save
+        </button>
+
+        <button
+            class="btn danger"
+            onclick="resetAll()"
+        >
+            Reset
+        </button>
+
+    </div>
+
+</header>
+
+
+<!-- MAIN -->
+
+<main class="layout">
+
+
+<!-- PARTICIPANTS -->
+
+<section class="card">
+
+    <div class="cardTitle">
+
+        <h2>👥 Participants</h2>
+
+        <span
+            class="count"
+            id="participantCount"
+        >
+            0
+        </span>
+
+    </div>
+
+
+    <div class="inputRow">
+
+        <input
+            id="participantInput"
+            placeholder="Enter name"
+            autocomplete="off"
+        >
+
+        <button
+            class="addBtn"
+            onclick="addParticipant()"
+        >
+            +
+        </button>
+
+    </div>
+
+
+    <div
+        class="list"
+        id="participantList"
+    ></div>
+
+
+    <button
+        class="btn danger"
+        style="width:100%;margin-top:10px"
+        onclick="clearParticipants()"
+    >
+        Clear Participants
+    </button>
+
+</section>
+
+
+<!-- WHEEL -->
+
+<section class="card wheelCard">
+
+    <div class="wheelHeader">
+
+        <h2>🎡 Spin Wheel</h2>
+
+        <span
+            class="status"
+            id="status"
+        >
+            READY
+        </span>
+
+    </div>
+
+
+    <div class="wheelArea">
+
+        <div class="pointer"></div>
+
+        <div class="wheelOuter">
+
+            <canvas
+                id="wheelCanvas"
+                width="900"
+                height="900"
+            ></canvas>
+
+            <div class="wheelCenter">
+                SPIN
             </div>
 
         </div>
 
-        <div class="header-buttons">
 
-            <button class="btn" onclick="saveData(true)">
-                💾 Save
-            </button>
+        <div
+            class="winnerOverlay"
+            id="winnerOverlay"
+        >
 
-            <button class="btn btn-red" onclick="resetEverything()">
-                Reset
-            </button>
+            <div class="winnerEmoji">
+                🏆
+            </div>
+
+            <div class="winnerTitle">
+                WINNER
+            </div>
+
+            <div
+                class="winnerName"
+                id="winnerName"
+            ></div>
+
+            <div
+                class="winnerPrize"
+                id="winnerPrize"
+            ></div>
 
         </div>
 
-    </header>
+    </div>
 
 
-    <!-- MAIN -->
+    <div class="controls">
 
-    <main class="main-grid">
+        <div>
 
-        <!-- PARTICIPANTS -->
-
-        <section class="card">
-
-            <div class="card-title">
-
-                <h2>👥 Participants</h2>
-
-                <span class="count" id="participantCount">
-                    0
-                </span>
-
+            <div class="winnerCountLabel">
+                NUMBER OF WINNERS
             </div>
 
-            <div class="input-row">
+            <select id="winnerCount">
 
-                <input
-                    id="participantInput"
-                    type="text"
-                    placeholder="Enter participant name"
-                    autocomplete="off"
-                >
+                <option value="1">
+                    1 Winner
+                </option>
 
-                <button
-                    class="add-button"
-                    onclick="addParticipant()"
-                >
-                    +
-                </button>
+                <option value="2">
+                    2 Winners
+                </option>
 
-            </div>
+                <option value="3">
+                    3 Winners
+                </option>
 
-            <div class="list" id="participantList"></div>
+                <option value="4">
+                    4 Winners
+                </option>
 
-            <button
-                class="btn btn-red"
-                style="width:100%;margin-top:10px;"
-                onclick="clearParticipants()"
-            >
-                Clear Participants
-            </button>
+                <option value="5">
+                    5 Winners
+                </option>
 
-        </section>
-
-
-        <!-- DRAW -->
-
-        <section class="card draw-card">
-
-            <div class="draw-header">
-
-                <h2>🎰 Live Draw</h2>
-
-                <span class="status" id="status">
-                    READY
-                </span>
-
-            </div>
-
-
-            <div class="display">
-
-                <div class="display-label" id="displayLabel">
-                    Ready for draw
-                </div>
-
-                <div class="draw-name" id="drawName">
-                    PRIZE WINNER
-                </div>
-
-                <div class="draw-prize" id="drawPrize">
-                    Add participants & prizes
-                </div>
-
-            </div>
-
-
-            <div class="draw-settings">
-
-                <div class="setting">
-
-                    <label>
-                        NUMBER OF WINNERS
-                    </label>
-
-                    <select id="winnerCount">
-
-                        <option value="1">
-                            1 Winner
-                        </option>
-
-                        <option value="2">
-                            2 Winners
-                        </option>
-
-                        <option value="3">
-                            3 Winners
-                        </option>
-
-                        <option value="4">
-                            4 Winners
-                        </option>
-
-                        <option value="5">
-                            5 Winners
-                        </option>
-
-                        <option value="10">
-                            10 Winners
-                        </option>
-
-                    </select>
-
-                </div>
-
-            </div>
-
-
-            <button
-                class="start-button"
-                id="startButton"
-                onclick="startRandomDraw()"
-            >
-                🎲 START FAIR RANDOM DRAW
-            </button>
-
-        </section>
-
-
-        <!-- PRIZES -->
-
-        <section class="card">
-
-            <div class="card-title">
-
-                <h2>🎁 Prizes</h2>
-
-                <span class="count" id="prizeCount">
-                    0
-                </span>
-
-            </div>
-
-
-            <div class="input-row">
-
-                <input
-                    id="prizeInput"
-                    type="text"
-                    placeholder="e.g. ₦50,000"
-                    autocomplete="off"
-                >
-
-                <button
-                    class="add-button"
-                    onclick="addPrize()"
-                >
-                    +
-                </button>
-
-            </div>
-
-
-            <div class="list" id="prizeList"></div>
-
-
-            <button
-                class="btn btn-red"
-                style="width:100%;margin-top:10px;"
-                onclick="clearPrizes()"
-            >
-                Clear Prizes
-            </button>
-
-        </section>
-
-    </main>
-
-
-    <!-- RARITY GUIDE -->
-
-    <section class="card rarity-guide">
-
-        <div class="card-title">
-
-            <h2>🎁 Prize Rarity System</h2>
-
-        </div>
-
-        <div class="rarity-grid">
-
-            <div class="rarity">
-                <div class="rarity-number">1</div>
-                <div class="rarity-name">COMMON</div>
-            </div>
-
-            <div class="rarity">
-                <div class="rarity-number">2</div>
-                <div class="rarity-name">RARE</div>
-            </div>
-
-            <div class="rarity">
-                <div class="rarity-number">3</div>
-                <div class="rarity-name">RARE</div>
-            </div>
-
-            <div class="rarity">
-                <div class="rarity-number">4</div>
-                <div class="rarity-name">VERY RARE</div>
-            </div>
-
-            <div class="rarity">
-                <div class="rarity-number">5</div>
-                <div class="rarity-name">EXTREME RARE</div>
-            </div>
-
-            <div class="rarity">
-                <div class="rarity-number">6+</div>
-                <div class="rarity-name">HOST CHOICE ONLY</div>
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- WINNER HISTORY -->
-
-    <section class="card history-card">
-
-        <div class="card-title">
-
-            <h2>🏆 Winner History</h2>
-
-            <button
-                class="btn btn-red"
-                onclick="clearHistory()"
-            >
-                Clear
-            </button>
-
-        </div>
-
-        <div class="history" id="history"></div>
-
-    </section>
-
-
-    <!-- HOST CHOICE AT THE VERY BOTTOM -->
-
-    <section class="card host-card">
-
-        <div class="host-title">
-
-            <h2>👑 Host Choice</h2>
-
-            <span class="host-badge">
-                HOST ONLY
-            </span>
-
-        </div>
-
-
-        <div class="host-description">
-
-            Host Choice allows the host to explicitly select a
-            participant and a specific prize. Host Choice prizes,
-            including special prizes such as iPhones, can be reserved
-            exclusively for this section and will not appear in the
-            Fair Random draw.
-
-        </div>
-
-
-        <div class="host-grid">
-
-            <div class="host-field">
-
-                <label>
-                    SELECT PARTICIPANT
-                </label>
-
-                <select id="hostParticipant">
-                    <option value="">
-                        Choose participant
-                    </option>
-                </select>
-
-            </div>
-
-
-            <div class="host-field">
-
-                <label>
-                    SELECT PRIZE
-                </label>
-
-                <select id="hostPrize">
-                    <option value="">
-                        Choose prize
-                    </option>
-                </select>
-
-            </div>
+            </select>
 
         </div>
 
 
         <button
-            class="host-button"
-            id="hostButton"
-            onclick="startHostChoice()"
+            class="startBtn"
+            id="startBtn"
+            onclick="startDraw()"
         >
-            👑 SELECT HOST CHOICE WINNER
+            🎡 SPIN THE WHEEL
         </button>
 
-    </section>
+    </div>
+
+</section>
+
+
+<!-- PRIZES -->
+
+<section class="card">
+
+    <div class="cardTitle">
+
+        <h2>🎁 Prizes</h2>
+
+        <span
+            class="count"
+            id="prizeCount"
+        >
+            0
+        </span>
+
+    </div>
+
+
+    <div class="inputRow">
+
+        <input
+            id="prizeInput"
+            placeholder="Prize name"
+            autocomplete="off"
+        >
+
+        <button
+            class="addBtn"
+            onclick="addPrize()"
+        >
+            +
+        </button>
+
+    </div>
+
+
+    <label
+        class="uploadLabel"
+        for="prizeImageInput"
+    >
+        📷 Add image to next prize
+    </label>
+
+    <input
+        type="file"
+        id="prizeImageInput"
+        accept="image/*"
+    >
+
+
+    <div
+        class="prizeGallery"
+        id="prizeGallery"
+    ></div>
+
+
+    <button
+        class="btn danger"
+        style="width:100%;margin-top:10px"
+        onclick="clearPrizes()"
+    >
+        Clear Prizes
+    </button>
+
+</section>
+
+</main>
+
+
+<!-- HISTORY -->
+
+<section class="card historyCard">
+
+    <div class="cardTitle">
+
+        <h2>🏆 Winner History</h2>
+
+        <button
+            class="btn danger"
+            onclick="clearHistory()"
+        >
+            Clear
+        </button>
+
+    </div>
+
+
+    <div
+        class="history"
+        id="history"
+    ></div>
+
+</section>
+
+
+<!-- HOST CHOICE AT BOTTOM -->
+
+<section class="card hostCard">
+
+    <div class="hostHeader">
+
+        <h2>👑 Host Choice</h2>
+
+        <span class="hostBadge">
+            HOST ONLY
+        </span>
+
+    </div>
+
+
+    <div class="hostGrid">
+
+        <div>
+
+            <label>
+                PARTICIPANT
+            </label>
+
+            <select id="hostParticipant">
+
+                <option value="">
+                    Choose participant
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div>
+
+            <label>
+                PRIZE
+            </label>
+
+            <select id="hostPrize">
+
+                <option value="">
+                    Choose prize
+                </option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+
+    <button
+        class="hostButton"
+        onclick="hostChoice()"
+        id="hostButton"
+    >
+        👑 USE HOST CHOICE
+    </button>
+
+
+    <div class="hostNote">
+        Host Choice is a separate selection mode and is recorded
+        separately in the winner history.
+    </div>
+
+</section>
 
 </div>
 
@@ -1067,7 +1064,7 @@ select:focus {
 <script>
 
 /* ============================================================
-   APP DATA
+   DATA
 ============================================================ */
 
 let participants = [];
@@ -1075,29 +1072,9 @@ let prizes = [];
 let winners = [];
 
 let drawing = false;
+let wheelRotation = 0;
 
-
-/*
-    Prize rarity rules:
-
-    Position 1 = Common
-    Position 2 = Rare
-    Position 3 = Rare
-    Position 4 = Very Rare
-    Position 5 = Extreme Rare
-    Position 6+ = Host Choice Only
-
-    Important:
-    Position is based on the order prizes were originally added.
-*/
-
-const rarityRules = [
-    "Common",
-    "Rare",
-    "Rare",
-    "Very Rare",
-    "Extreme Rare"
-];
+let pendingPrizeImage = null;
 
 
 /* ============================================================
@@ -1110,11 +1087,14 @@ const participantInput =
 const prizeInput =
     document.getElementById("prizeInput");
 
+const prizeImageInput =
+    document.getElementById("prizeImageInput");
+
 const participantList =
     document.getElementById("participantList");
 
-const prizeList =
-    document.getElementById("prizeList");
+const prizeGallery =
+    document.getElementById("prizeGallery");
 
 const participantCount =
     document.getElementById("participantCount");
@@ -1122,14 +1102,17 @@ const participantCount =
 const prizeCount =
     document.getElementById("prizeCount");
 
-const drawName =
-    document.getElementById("drawName");
+const canvas =
+    document.getElementById("wheelCanvas");
 
-const drawPrize =
-    document.getElementById("drawPrize");
+const ctx =
+    canvas.getContext("2d");
 
-const displayLabel =
-    document.getElementById("displayLabel");
+const startBtn =
+    document.getElementById("startBtn");
+
+const hostButton =
+    document.getElementById("hostButton");
 
 const statusEl =
     document.getElementById("status");
@@ -1146,87 +1129,81 @@ const hostParticipant =
 const hostPrize =
     document.getElementById("hostPrize");
 
-const startButton =
-    document.getElementById("startButton");
+const winnerOverlay =
+    document.getElementById("winnerOverlay");
 
-const hostButton =
-    document.getElementById("hostButton");
+const winnerName =
+    document.getElementById("winnerName");
+
+const winnerPrize =
+    document.getElementById("winnerPrize");
 
 
 /* ============================================================
-   RARITY
+   IMAGE SELECTION
 ============================================================ */
 
-function getRarity(index) {
+prizeImageInput.addEventListener(
+    "change",
+    function(){
 
-    if (index >= 5) {
-        return "Host Choice Only";
+        const file =
+            this.files[0];
+
+        if(!file){
+            pendingPrizeImage = null;
+            return;
+        }
+
+        const reader =
+            new FileReader();
+
+        reader.onload =
+            function(event){
+
+                pendingPrizeImage =
+                    event.target.result;
+
+            };
+
+        reader.readAsDataURL(file);
     }
-
-    return rarityRules[index];
-}
-
-
-function getRarityClass(rarity) {
-
-    switch (rarity) {
-
-        case "Common":
-            return "common";
-
-        case "Rare":
-            return "rare";
-
-        case "Very Rare":
-            return "very-rare";
-
-        case "Extreme Rare":
-            return "extreme";
-
-        case "Ultra Rare":
-            return "ultra";
-
-        default:
-            return "host-only";
-    }
-}
-
-
-/*
-    Only the first five prize positions
-    are eligible for the fair random draw.
-*/
-
-function getRandomEligiblePrizes() {
-
-    return prizes.filter(prize => {
-        return prize.hostOnly !== true;
-    });
-}
+);
 
 
 /* ============================================================
    ADD PARTICIPANT
 ============================================================ */
 
-function addParticipant() {
+function addParticipant(){
 
-    const name = participantInput.value.trim();
+    const name =
+        participantInput.value.trim();
 
-    if (!name) {
-        alert("Please enter a participant name.");
+    if(!name){
+
+        alert(
+            "Enter a participant name."
+        );
+
         return;
     }
 
     participants.push({
-        id: cryptoRandomId(),
-        name: name
+
+        id:uid(),
+
+        name:name
+
     });
 
     participantInput.value = "";
 
     renderParticipants();
-    updateHostParticipantSelect();
+
+    updateHostParticipants();
+
+    drawWheel();
 
     saveData();
 }
@@ -1236,31 +1213,40 @@ function addParticipant() {
    ADD PRIZE
 ============================================================ */
 
-function addPrize() {
+function addPrize(){
 
-    const name = prizeInput.value.trim();
+    const name =
+        prizeInput.value.trim();
 
-    if (!name) {
-        alert("Please enter a prize.");
+    if(!name){
+
+        alert(
+            "Enter a prize name."
+        );
+
         return;
     }
 
-    const position = prizes.length;
-
-    const hostOnly = position >= 5;
-
     prizes.push({
-        id: cryptoRandomId(),
-        name: name,
-        position: position,
-        hostOnly: hostOnly,
-        rarity: getRarity(position)
+
+        id:uid(),
+
+        name:name,
+
+        image:
+            pendingPrizeImage || null
+
     });
 
     prizeInput.value = "";
 
+    pendingPrizeImage = null;
+
+    prizeImageInput.value = "";
+
     renderPrizes();
-    updateHostPrizeSelect();
+
+    updateHostPrizes();
 
     saveData();
 }
@@ -1270,83 +1256,95 @@ function addPrize() {
    PARTICIPANTS
 ============================================================ */
 
-function renderParticipants() {
+function renderParticipants(){
 
     participantList.innerHTML = "";
 
     participantCount.textContent =
         participants.length;
 
-    if (!participants.length) {
+    if(!participants.length){
 
         participantList.innerHTML = `
             <div class="empty">
-                No participants added yet.
+                No participants yet.
             </div>
         `;
 
         return;
     }
 
-    participants.forEach((person, index) => {
+    participants.forEach(
+        function(person,index){
 
-        const item =
-            document.createElement("div");
+            const div =
+                document.createElement("div");
 
-        item.className = "list-item";
+            div.className =
+                "listItem";
 
-        item.innerHTML = `
+            div.innerHTML = `
 
-            <div class="item-text">
+                <div class="itemText">
 
-                <div class="item-name">
-                    ${index + 1}. ${escapeHTML(person.name)}
+                    <div class="itemName">
+                        ${escapeHTML(
+                            (index+1)+". "+person.name
+                        )}
+                    </div>
+
                 </div>
 
-            </div>
+                <button
+                    class="removeBtn"
+                    onclick="removeParticipant('${person.id}')"
+                >
+                    ×
+                </button>
+            `;
 
-            <button
-                class="remove-button"
-                onclick="removeParticipant('${person.id}')"
-            >
-                ×
-            </button>
-
-        `;
-
-        participantList.appendChild(item);
-    });
+            participantList.appendChild(div);
+        }
+    );
 }
 
 
-function removeParticipant(id) {
+function removeParticipant(id){
 
     participants =
         participants.filter(
-            person => person.id !== id
+            p => p.id !== id
         );
 
     renderParticipants();
-    updateHostParticipantSelect();
+
+    updateHostParticipants();
+
+    drawWheel();
 
     saveData();
 }
 
 
-function clearParticipants() {
+function clearParticipants(){
 
-    if (!participants.length) {
+    if(!participants.length)
         return;
-    }
 
-    if (!confirm("Clear all participants?")) {
+    if(
+        !confirm(
+            "Clear all participants?"
+        )
+    )
         return;
-    }
 
     participants = [];
 
     renderParticipants();
-    updateHostParticipantSelect();
+
+    updateHostParticipants();
+
+    drawWheel();
 
     saveData();
 }
@@ -1356,243 +1354,464 @@ function clearParticipants() {
    PRIZES
 ============================================================ */
 
-function renderPrizes() {
+function renderPrizes(){
 
-    prizeList.innerHTML = "";
+    prizeGallery.innerHTML = "";
 
     prizeCount.textContent =
         prizes.length;
 
-    if (!prizes.length) {
+    if(!prizes.length){
 
-        prizeList.innerHTML = `
-            <div class="empty">
-                No prizes added yet.
+        prizeGallery.innerHTML = `
+            <div
+                class="empty"
+                style="grid-column:1/-1"
+            >
+                No prizes yet.
             </div>
         `;
 
         return;
     }
 
-    prizes.forEach((prize, index) => {
+    prizes.forEach(
+        function(prize,index){
 
-        const rarity =
-            getRarity(index);
+            const div =
+                document.createElement("div");
 
-        const rarityClass =
-            getRarityClass(rarity);
+            div.className =
+                "prizeCard";
 
-        const item =
-            document.createElement("div");
+            let imageHTML;
 
-        item.className = "list-item";
+            if(prize.image){
 
-        item.innerHTML = `
+                imageHTML = `
+                    <img
+                        class="prizeImage"
+                        src="${prize.image}"
+                        alt=""
+                    >
+                `;
 
-            <div class="item-text">
+            }else{
 
-                <div class="item-name">
-                    ${index + 1}. ${escapeHTML(prize.name)}
+                imageHTML = `
+                    <div class="prizeNoImage">
+                        🎁
+                    </div>
+                `;
+            }
+
+            div.innerHTML = `
+
+                ${imageHTML}
+
+                <div class="prizeInfo">
+
+                    <div class="prizeName">
+                        ${escapeHTML(prize.name)}
+                    </div>
+
+                    <div class="prizePosition">
+                        Prize ${index+1}
+                    </div>
+
+                    <button
+                        class="removeBtn"
+                        style="margin-top:6px"
+                        onclick="removePrize('${prize.id}')"
+                    >
+                        Remove
+                    </button>
+
                 </div>
+            `;
 
-                <span class="badge ${rarityClass}">
-                    ${escapeHTML(rarity)}
-                </span>
-
-            </div>
-
-            <button
-                class="remove-button"
-                onclick="removePrize('${prize.id}')"
-            >
-                ×
-            </button>
-
-        `;
-
-        prizeList.appendChild(item);
-    });
+            prizeGallery.appendChild(div);
+        }
+    );
 }
 
 
-function removePrize(id) {
+function removePrize(id){
 
     prizes =
         prizes.filter(
-            prize => prize.id !== id
+            p => p.id !== id
         );
 
-    /*
-        Recalculate rarity according to the new order.
-    */
-
-    prizes.forEach((prize, index) => {
-
-        prize.position = index;
-
-        prize.hostOnly = index >= 5;
-
-        prize.rarity =
-            getRarity(index);
-    });
-
     renderPrizes();
-    updateHostPrizeSelect();
+
+    updateHostPrizes();
 
     saveData();
 }
 
 
-function clearPrizes() {
+function clearPrizes(){
 
-    if (!prizes.length) {
+    if(!prizes.length)
         return;
-    }
 
-    if (!confirm("Clear all prizes?")) {
+    if(
+        !confirm(
+            "Clear all prizes?"
+        )
+    )
         return;
-    }
 
     prizes = [];
 
     renderPrizes();
-    updateHostPrizeSelect();
+
+    updateHostPrizes();
 
     saveData();
 }
 
 
 /* ============================================================
-   HOST PARTICIPANT SELECT
+   DRAW WHEEL
 ============================================================ */
 
-function updateHostParticipantSelect() {
+function drawWheel(){
 
-    hostParticipant.innerHTML = `
-        <option value="">
-            Choose participant
-        </option>
-    `;
+    const size =
+        canvas.width;
 
-    participants.forEach(person => {
+    ctx.clearRect(
+        0,
+        0,
+        size,
+        size
+    );
 
-        const option =
-            document.createElement("option");
+    const cx =
+        size/2;
 
-        option.value = person.id;
+    const cy =
+        size/2;
 
-        option.textContent =
-            person.name;
+    const radius =
+        size/2 - 20;
 
-        hostParticipant.appendChild(option);
-    });
+    if(!participants.length){
+
+        ctx.beginPath();
+
+        ctx.arc(
+            cx,
+            cy,
+            radius,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fillStyle =
+            "#161616";
+
+        ctx.fill();
+
+        ctx.strokeStyle =
+            "#ffd54a";
+
+        ctx.lineWidth = 12;
+
+        ctx.stroke();
+
+        ctx.fillStyle =
+            "#666";
+
+        ctx.font =
+            "bold 34px Arial";
+
+        ctx.textAlign =
+            "center";
+
+        ctx.textBaseline =
+            "middle";
+
+        ctx.fillText(
+            "ADD NAMES",
+            cx,
+            cy
+        );
+
+        return;
+    }
+
+    const total =
+        participants.length;
+
+    const slice =
+        (Math.PI*2)/total;
+
+
+    const colors = [
+
+        "#ff1744",
+        "#ff6d00",
+        "#ffd54a",
+        "#00c853",
+        "#00b8d4",
+        "#2979ff",
+        "#651fff",
+        "#d500f9",
+        "#f50057",
+        "#ff1744"
+
+    ];
+
+
+    for(
+        let i=0;
+        i<total;
+        i++
+    ){
+
+        const start =
+            i*slice -
+            Math.PI/2;
+
+        const end =
+            start+slice;
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            cx,
+            cy
+        );
+
+        ctx.arc(
+            cx,
+            cy,
+            radius,
+            start,
+            end
+        );
+
+        ctx.closePath();
+
+        ctx.fillStyle =
+            colors[
+                i%colors.length
+            ];
+
+        ctx.fill();
+
+        ctx.strokeStyle =
+            "rgba(0,0,0,.55)";
+
+        ctx.lineWidth =
+            4;
+
+        ctx.stroke();
+
+
+        /* NAME */
+
+        ctx.save();
+
+        ctx.translate(
+            cx,
+            cy
+        );
+
+        ctx.rotate(
+            start+slice/2
+        );
+
+        ctx.textAlign =
+            "right";
+
+        ctx.textBaseline =
+            "middle";
+
+        ctx.fillStyle =
+            "#fff";
+
+        let fontSize =
+            total > 15 ? 18 :
+            total > 10 ? 21 :
+            25;
+
+        ctx.font =
+            "bold "+fontSize+"px Arial";
+
+        let name =
+            participants[i].name;
+
+        if(name.length > 16){
+
+            name =
+                name.substring(
+                    0,
+                    15
+                )+"…";
+        }
+
+        ctx.shadowColor =
+            "rgba(0,0,0,.7)";
+
+        ctx.shadowBlur =
+            5;
+
+        ctx.fillText(
+            name,
+            radius-25,
+            0
+        );
+
+        ctx.restore();
+    }
+
+
+    /* OUTER RING */
+
+    ctx.beginPath();
+
+    ctx.arc(
+        cx,
+        cy,
+        radius,
+        0,
+        Math.PI*2
+    );
+
+    ctx.strokeStyle =
+        "#ffd54a";
+
+    ctx.lineWidth =
+        10;
+
+    ctx.stroke();
+
 }
 
 
 /* ============================================================
-   HOST PRIZE SELECT
+   START RANDOM DRAW
 ============================================================ */
 
-function updateHostPrizeSelect() {
+async function startDraw(){
 
-    hostPrize.innerHTML = `
-        <option value="">
-            Choose prize
-        </option>
-    `;
-
-    prizes.forEach((prize, index) => {
-
-        const option =
-            document.createElement("option");
-
-        option.value = prize.id;
-
-        option.textContent =
-            `${index + 1}. ${prize.name} — ${getRarity(index)}`;
-
-        hostPrize.appendChild(option);
-    });
-}
-
-
-/* ============================================================
-   FAIR RANDOM DRAW
-============================================================ */
-
-async function startRandomDraw() {
-
-    if (drawing) {
+    if(drawing)
         return;
-    }
 
-    if (!participants.length) {
-
-        alert("Add participants first.");
-
-        return;
-    }
-
-    const eligiblePrizes =
-        getRandomEligiblePrizes();
-
-    if (!eligiblePrizes.length) {
+    if(!participants.length){
 
         alert(
-            "There are no prizes available for the Fair Random draw. " +
-            "Prizes from position 6 onward are Host Choice Only."
+            "Add participants first."
         );
 
         return;
     }
 
-    const requested =
-        Number(winnerCount.value);
-
-    if (requested > participants.length) {
+    if(!prizes.length){
 
         alert(
-            `You have only ${participants.length} participants.`
+            "Add at least one prize first."
         );
 
         return;
     }
 
-    if (requested > eligiblePrizes.length) {
+    const count =
+        Number(
+            winnerCount.value
+        );
+
+    if(
+        count >
+        participants.length
+    ){
 
         alert(
-            `There are only ${eligiblePrizes.length} prizes available ` +
-            `for the Fair Random draw.`
+            "There are not enough participants."
         );
 
         return;
     }
+
+    if(
+        count >
+        prizes.length
+    ){
+
+        alert(
+            "There are not enough prizes."
+        );
+
+        return;
+    }
+
 
     drawing = true;
 
-    setDrawingState(true);
+    startBtn.disabled = true;
 
-    let availableParticipants =
-        [...participants];
+    hostButton.disabled = true;
 
-    let availablePrizes =
-        [...eligiblePrizes];
+    statusEl.textContent =
+        "SPINNING";
 
-    for (
-        let i = 0;
-        i < requested;
+    statusEl.style.color =
+        "#ffd54a";
+
+
+    for(
+        let i=0;
+        i<count;
         i++
-    ) {
+    ){
+
+        if(
+            participants.length === 0 ||
+            prizes.length === 0
+        )
+            break;
+
+
+        const winnerIndex =
+            Math.floor(
+                Math.random() *
+                participants.length
+            );
+
 
         const winner =
-            await animateWinner(
-                availableParticipants
+            participants[
+                winnerIndex
+            ];
+
+
+        const prizeIndex =
+            Math.floor(
+                Math.random() *
+                prizes.length
             );
 
+
         const prize =
-            await animatePrize(
-                availablePrizes
-            );
+            prizes[
+                prizeIndex
+            ];
+
+
+        await spinWheelToIndex(
+            winnerIndex
+        );
+
+
+        showWinner(
+            winner,
+            prize
+        );
+
 
         recordWinner(
             winner,
@@ -1600,212 +1819,131 @@ async function startRandomDraw() {
             "Fair Random"
         );
 
-        availableParticipants =
-            availableParticipants.filter(
-                p => p.id !== winner.id
-            );
 
-        availablePrizes =
-            availablePrizes.filter(
-                p => p.id !== prize.id
-            );
+        participants.splice(
+            winnerIndex,
+            1
+        );
 
-        /*
-            Remove the participant after winning.
-        */
 
-        participants =
-            participants.filter(
-                p => p.id !== winner.id
-            );
+        prizes.splice(
+            prizeIndex,
+            1
+        );
 
-        /*
-            Remove the prize after being awarded.
-        */
-
-        prizes =
-            prizes.filter(
-                p => p.id !== prize.id
-            );
-
-        /*
-            Recalculate prize positions.
-        */
-
-        recalculatePrizeRarity();
 
         renderParticipants();
+
         renderPrizes();
 
-        updateHostParticipantSelect();
-        updateHostPrizeSelect();
+        updateHostParticipants();
 
-        await sleep(800);
+        updateHostPrizes();
+
+        drawWheel();
+
+        await sleep(1600);
+
+        hideWinner();
     }
 
-    statusEl.textContent =
-        "DRAW COMPLETE";
-
-    statusEl.style.color =
-        "#20df78";
-
-    displayLabel.textContent =
-        "DRAW COMPLETE";
 
     drawing = false;
 
-    setDrawingState(false);
+    startBtn.disabled = false;
+
+    hostButton.disabled = false;
+
+    statusEl.textContent =
+        "READY";
+
+    statusEl.style.color =
+        "#28e07b";
 
     saveData();
 }
 
 
 /* ============================================================
-   WINNER ANIMATION
+   WHEEL SPIN
 ============================================================ */
 
-function animateWinner(list) {
+function spinWheelToIndex(index){
 
-    return new Promise(resolve => {
+    return new Promise(
+        function(resolve){
 
-        let elapsed = 0;
+            const total =
+                participants.length;
 
-        const duration = 3000;
+            const slice =
+                360/total;
 
-        displayLabel.textContent =
-            "Selecting winner...";
 
-        drawPrize.textContent = "";
+            /*
+                The selected segment is placed
+                under the pointer at the top.
+            */
 
-        drawName.classList.add("spinning");
+            const segmentCenter =
+                index*slice +
+                slice/2;
 
-        const interval =
-            setInterval(() => {
 
-                const random =
-                    list[
-                        Math.floor(
-                            Math.random() * list.length
-                        )
-                    ];
+            const target =
+                360 -
+                segmentCenter;
 
-                drawName.textContent =
-                    random.name;
 
-                elapsed += 100;
+            const extra =
+                360*7;
 
-                if (elapsed >= duration) {
 
-                    clearInterval(interval);
+            wheelRotation +=
+                extra + target;
 
-                    const finalWinner =
-                        list[
-                            Math.floor(
-                                Math.random() *
-                                list.length
-                            )
-                        ];
 
-                    drawName.classList.remove(
-                        "spinning"
-                    );
+            canvas.style.transform =
+                `rotate(${wheelRotation}deg)`;
 
-                    drawName.classList.add(
-                        "reveal"
-                    );
 
-                    drawName.textContent =
-                        finalWinner.name;
-
-                    setTimeout(() => {
-
-                        drawName.classList.remove(
-                            "reveal"
-                        );
-
-                        resolve(finalWinner);
-
-                    }, 500);
-                }
-
-            }, 100);
-    });
+            setTimeout(
+                resolve,
+                5600
+            );
+        }
+    );
 }
 
 
 /* ============================================================
-   PRIZE ANIMATION
+   SHOW WINNER
 ============================================================ */
 
-function animatePrize(list) {
+function showWinner(
+    winner,
+    prize
+){
 
-    return new Promise(resolve => {
+    winnerName.textContent =
+        winner.name;
 
-        let elapsed = 0;
+    winnerPrize.textContent =
+        "🎁 "+prize.name;
 
-        const duration = 2200;
+    winnerOverlay.classList.add(
+        "show"
+    );
 
-        displayLabel.textContent =
-            "Selecting prize...";
+    celebrate();
+}
 
-        drawPrize.classList.add("spinning");
 
-        const interval =
-            setInterval(() => {
+function hideWinner(){
 
-                const random =
-                    list[
-                        Math.floor(
-                            Math.random() * list.length
-                        )
-                    ];
-
-                drawPrize.textContent =
-                    "🎁 " + random.name;
-
-                elapsed += 100;
-
-                if (elapsed >= duration) {
-
-                    clearInterval(interval);
-
-                    const finalPrize =
-                        list[
-                            Math.floor(
-                                Math.random() *
-                                list.length
-                            )
-                        ];
-
-                    drawPrize.classList.remove(
-                        "spinning"
-                    );
-
-                    drawPrize.classList.add(
-                        "reveal"
-                    );
-
-                    drawPrize.textContent =
-                        "🎁 " + finalPrize.name;
-
-                    displayLabel.textContent =
-                        "WINNER SELECTED";
-
-                    celebrate();
-
-                    setTimeout(() => {
-
-                        drawPrize.classList.remove(
-                            "reveal"
-                        );
-
-                        resolve(finalPrize);
-
-                    }, 600);
-                }
-
-            }, 100);
-    });
+    winnerOverlay.classList.remove(
+        "show"
+    );
 }
 
 
@@ -1813,39 +1951,98 @@ function animatePrize(list) {
    HOST CHOICE
 ============================================================ */
 
-async function startHostChoice() {
+function updateHostParticipants(){
 
-    if (drawing) {
+    hostParticipant.innerHTML = `
+        <option value="">
+            Choose participant
+        </option>
+    `;
+
+    participants.forEach(
+        function(person){
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value =
+                person.id;
+
+            option.textContent =
+                person.name;
+
+            hostParticipant.appendChild(
+                option
+            );
+        }
+    );
+}
+
+
+function updateHostPrizes(){
+
+    hostPrize.innerHTML = `
+        <option value="">
+            Choose prize
+        </option>
+    `;
+
+    prizes.forEach(
+        function(prize){
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value =
+                prize.id;
+
+            option.textContent =
+                prize.name;
+
+            hostPrize.appendChild(
+                option
+            );
+        }
+    );
+}
+
+
+async function hostChoice(){
+
+    if(drawing)
         return;
-    }
 
-    const participantId =
+    const personId =
         hostParticipant.value;
 
     const prizeId =
         hostPrize.value;
 
-    if (!participantId) {
+    if(!personId){
 
         alert(
-            "Select a participant for Host Choice."
+            "Choose a participant."
         );
 
         return;
     }
 
-    if (!prizeId) {
+    if(!prizeId){
 
         alert(
-            "Select a prize for Host Choice."
+            "Choose a prize."
         );
 
         return;
     }
 
-    const winner =
+    const person =
         participants.find(
-            p => p.id === participantId
+            p => p.id === personId
         );
 
     const prize =
@@ -1853,13 +2050,15 @@ async function startHostChoice() {
             p => p.id === prizeId
         );
 
-    if (!winner || !prize) {
+    if(!person || !prize)
         return;
-    }
+
 
     drawing = true;
 
-    setDrawingState(true);
+    startBtn.disabled = true;
+
+    hostButton.disabled = true;
 
     statusEl.textContent =
         "HOST CHOICE";
@@ -1867,244 +2066,169 @@ async function startHostChoice() {
     statusEl.style.color =
         "#ffd54a";
 
+
     /*
-        A short animation is used for presentation,
-        but the selected participant and prize are
-        explicitly chosen by the host.
+        Presentation animation only.
+        The selected host participant/prize
+        are then shown explicitly.
     */
 
-    displayLabel.textContent =
-        "HOST CHOICE";
+    await sleep(1200);
 
-    drawName.classList.add(
-        "spinning"
+    showWinner(
+        person,
+        prize
     );
 
-    drawPrize.classList.add(
-        "spinning"
+    recordWinner(
+        person,
+        prize,
+        "Host Choice"
     );
 
-    let elapsed = 0;
 
-    const animation =
-        setInterval(() => {
+    participants =
+        participants.filter(
+            p => p.id !== person.id
+        );
 
-            const randomPerson =
-                participants[
-                    Math.floor(
-                        Math.random() *
-                        participants.length
-                    )
-                ];
+    prizes =
+        prizes.filter(
+            p => p.id !== prize.id
+        );
 
-            const randomPrize =
-                prizes[
-                    Math.floor(
-                        Math.random() *
-                        prizes.length
-                    )
-                ];
 
-            drawName.textContent =
-                randomPerson.name;
+    renderParticipants();
 
-            drawPrize.textContent =
-                "🎁 " + randomPrize.name;
+    renderPrizes();
 
-            elapsed += 100;
+    updateHostParticipants();
 
-            if (elapsed >= 2500) {
+    updateHostPrizes();
 
-                clearInterval(animation);
+    drawWheel();
 
-                drawName.classList.remove(
-                    "spinning"
-                );
+    saveData();
 
-                drawPrize.classList.remove(
-                    "spinning"
-                );
 
-                drawName.classList.add(
-                    "reveal"
-                );
+    await sleep(1800);
 
-                drawPrize.classList.add(
-                    "reveal"
-                );
+    hideWinner();
 
-                drawName.textContent =
-                    winner.name;
+    drawing = false;
 
-                drawPrize.textContent =
-                    "🎁 " + prize.name;
+    startBtn.disabled = false;
 
-                displayLabel.textContent =
-                    "HOST CHOICE";
+    hostButton.disabled = false;
 
-                celebrate();
+    statusEl.textContent =
+        "READY";
 
-                setTimeout(() => {
-
-                    recordWinner(
-                        winner,
-                        prize,
-                        "Host Choice"
-                    );
-
-                    participants =
-                        participants.filter(
-                            p => p.id !== winner.id
-                        );
-
-                    prizes =
-                        prizes.filter(
-                            p => p.id !== prize.id
-                        );
-
-                    recalculatePrizeRarity();
-
-                    renderParticipants();
-                    renderPrizes();
-
-                    updateHostParticipantSelect();
-                    updateHostPrizeSelect();
-
-                    drawName.classList.remove(
-                        "reveal"
-                    );
-
-                    drawPrize.classList.remove(
-                        "reveal"
-                    );
-
-                    statusEl.textContent =
-                        "DRAW COMPLETE";
-
-                    statusEl.style.color =
-                        "#20df78";
-
-                    drawing = false;
-
-                    setDrawingState(false);
-
-                    saveData();
-
-                }, 900);
-            }
-
-        }, 100);
+    statusEl.style.color =
+        "#28e07b";
 }
 
 
 /* ============================================================
-   RECALCULATE PRIZE RARITY
-============================================================ */
-
-function recalculatePrizeRarity() {
-
-    prizes.forEach((prize, index) => {
-
-        prize.position = index;
-
-        prize.hostOnly =
-            index >= 5;
-
-        prize.rarity =
-            getRarity(index);
-    });
-}
-
-
-/* ============================================================
-   WINNER HISTORY
+   HISTORY
 ============================================================ */
 
 function recordWinner(
     person,
     prize,
     mode
-) {
+){
 
     winners.unshift({
 
-        id: cryptoRandomId(),
+        id:uid(),
 
-        name: person.name,
+        name:person.name,
 
-        prize: prize.name,
+        prize:prize.name,
 
-        mode: mode,
+        mode:mode,
 
-        time: new Date().toLocaleString()
+        time:new Date()
+            .toLocaleString()
+
     });
 
     renderHistory();
 }
 
 
-function renderHistory() {
+function renderHistory(){
 
     historyEl.innerHTML = "";
 
-    if (!winners.length) {
+    if(!winners.length){
 
         historyEl.innerHTML = `
             <div class="empty">
-                No winners selected yet.
+                No winners yet.
             </div>
         `;
 
         return;
     }
 
-    winners.forEach((winner, index) => {
 
-        const item =
-            document.createElement("div");
+    winners.forEach(
+        function(item,index){
 
-        item.className =
-            "history-item";
+            const div =
+                document.createElement(
+                    "div"
+                );
 
-        item.innerHTML = `
+            div.className =
+                "historyItem";
 
-            <div class="history-number">
-                ${index + 1}
-            </div>
+            div.innerHTML = `
 
-            <div class="history-content">
-
-                <div class="history-name">
-                    🏆 ${escapeHTML(winner.name)}
+                <div class="historyNumber">
+                    ${index+1}
                 </div>
 
-                <div class="history-prize">
-                    🎁 ${escapeHTML(winner.prize)}
+                <div>
+
+                    <div class="historyName">
+                        🏆 ${escapeHTML(item.name)}
+                    </div>
+
+                    <div class="historyPrize">
+                        🎁 ${escapeHTML(item.prize)}
+                    </div>
+
+                    <div class="historyMode">
+                        ${escapeHTML(item.mode)}
+                        •
+                        ${escapeHTML(item.time)}
+                    </div>
+
                 </div>
+            `;
 
-                <div class="history-info">
-                    ${escapeHTML(winner.mode)}
-                    •
-                    ${escapeHTML(winner.time)}
-                </div>
-
-            </div>
-        `;
-
-        historyEl.appendChild(item);
-    });
+            historyEl.appendChild(
+                div
+            );
+        }
+    );
 }
 
 
-function clearHistory() {
+function clearHistory(){
 
-    if (!winners.length) {
+    if(!winners.length)
         return;
-    }
 
-    if (!confirm("Clear winner history?")) {
+    if(
+        !confirm(
+            "Clear winner history?"
+        )
+    )
         return;
-    }
 
     winners = [];
 
@@ -2115,120 +2239,105 @@ function clearHistory() {
 
 
 /* ============================================================
-   DRAW STATE
-============================================================ */
-
-function setDrawingState(disabled) {
-
-    startButton.disabled =
-        disabled;
-
-    hostButton.disabled =
-        disabled;
-
-    winnerCount.disabled =
-        disabled;
-
-    startButton.style.opacity =
-        disabled ? ".5" : "1";
-
-    hostButton.style.opacity =
-        disabled ? ".5" : "1";
-}
-
-
-/* ============================================================
    CONFETTI
 ============================================================ */
 
-function celebrate() {
+function celebrate(){
 
     const colors = [
+
         "#ff1744",
         "#ffd54a",
         "#ffffff",
         "#20df78",
         "#4da3ff"
+
     ];
 
-    for (let i = 0; i < 75; i++) {
+
+    for(
+        let i=0;
+        i<80;
+        i++
+    ){
 
         const piece =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
         piece.className =
             "confetti";
 
         piece.style.left =
-            Math.random() * 100 + "vw";
+            Math.random()*100+
+            "vw";
 
         piece.style.background =
             colors[
                 Math.floor(
-                    Math.random() *
+                    Math.random()*
                     colors.length
                 )
             ];
 
         piece.style.animationDuration =
-            (2 + Math.random() * 3) + "s";
+            (2+
+            Math.random()*3)+
+            "s";
 
-        piece.style.transform =
-            `rotate(${Math.random() * 360}deg)`;
-
-        document.body.appendChild(piece);
-
-        setTimeout(() => {
-            piece.remove();
-        }, 5500);
-    }
-}
+        document.body.appendChild(
+            piece
+        );
 
 
-/* ============================================================
-   LOCAL STORAGE
-============================================================ */
-
-function saveData(showMessage = false) {
-
-    const data = {
-
-        participants,
-
-        prizes,
-
-        winners,
-
-        savedAt:
-            new Date().toISOString()
-    };
-
-    localStorage.setItem(
-        "prizeWinnerAppData",
-        JSON.stringify(data)
-    );
-
-    if (showMessage) {
-
-        alert(
-            "Your giveaway data has been saved."
+        setTimeout(
+            () => piece.remove(),
+            5500
         );
     }
 }
 
 
-function loadData() {
+/* ============================================================
+   STORAGE
+============================================================ */
 
-    try {
+function saveData(show=false){
+
+    localStorage.setItem(
+        "prizeWheelData",
+        JSON.stringify({
+
+            participants,
+
+            prizes,
+
+            winners
+
+        })
+    );
+
+    if(show){
+
+        alert(
+            "Your data has been saved."
+        );
+    }
+}
+
+
+function loadData(){
+
+    try{
 
         const saved =
             localStorage.getItem(
-                "prizeWinnerAppData"
+                "prizeWheelData"
             );
 
-        if (!saved) {
+        if(!saved)
             return;
-        }
 
         const data =
             JSON.parse(saved);
@@ -2237,36 +2346,27 @@ function loadData() {
             Array.isArray(
                 data.participants
             )
-                ? data.participants
-                : [];
+            ? data.participants
+            : [];
 
         prizes =
             Array.isArray(
                 data.prizes
             )
-                ? data.prizes
-                : [];
+            ? data.prizes
+            : [];
 
         winners =
             Array.isArray(
                 data.winners
             )
-                ? data.winners
-                : [];
+            ? data.winners
+            : [];
 
-        /*
-            Make sure old/saved prizes receive
-            the current rarity system.
-        */
+    }catch(error){
 
-        recalculatePrizeRarity();
+        console.error(error);
 
-    } catch (error) {
-
-        console.error(
-            "Unable to load saved data.",
-            error
-        );
     }
 }
 
@@ -2275,15 +2375,14 @@ function loadData() {
    RESET
 ============================================================ */
 
-function resetEverything() {
+function resetAll(){
 
-    if (
+    if(
         !confirm(
-            "This will remove all participants, prizes and winner history. Continue?"
+            "Delete all participants, prizes and history?"
         )
-    ) {
+    )
         return;
-    }
 
     participants = [];
 
@@ -2291,24 +2390,14 @@ function resetEverything() {
 
     winners = [];
 
+    wheelRotation = 0;
+
+    canvas.style.transform =
+        "rotate(0deg)";
+
     localStorage.removeItem(
-        "prizeWinnerAppData"
+        "prizeWheelData"
     );
-
-    drawName.textContent =
-        "PRIZE WINNER";
-
-    drawPrize.textContent =
-        "Add participants & prizes";
-
-    displayLabel.textContent =
-        "Ready for draw";
-
-    statusEl.textContent =
-        "READY";
-
-    statusEl.style.color =
-        "#20df78";
 
     renderParticipants();
 
@@ -2316,9 +2405,13 @@ function resetEverything() {
 
     renderHistory();
 
-    updateHostParticipantSelect();
+    updateHostParticipants();
 
-    updateHostPrizeSelect();
+    updateHostPrizes();
+
+    drawWheel();
+
+    hideWinner();
 }
 
 
@@ -2326,67 +2419,61 @@ function resetEverything() {
    UTILITIES
 ============================================================ */
 
-function sleep(ms) {
+function sleep(ms){
 
     return new Promise(
-        resolve => setTimeout(resolve, ms)
+        resolve =>
+            setTimeout(
+                resolve,
+                ms
+            )
     );
 }
 
 
-function escapeHTML(value) {
+function uid(){
 
-    return String(value)
-
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-
-        .replace(
-            /</g,
-            "&lt;"
-        )
-
-        .replace(
-            />/g,
-            "&gt;"
-        )
-
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-}
-
-
-/*
-    Creates a sufficiently unique local ID
-    without requiring an external library.
-*/
-
-function cryptoRandomId() {
-
-    if (
-        window.crypto &&
+    if(
+        crypto &&
         crypto.randomUUID
-    ) {
+    ){
 
         return crypto.randomUUID();
     }
 
     return (
-        Date.now() +
+        Date.now()+
         "-" +
         Math.random()
             .toString(36)
             .substring(2)
     );
+}
+
+
+function escapeHTML(value){
+
+    return String(value)
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 }
 
 
@@ -2396,22 +2483,24 @@ function cryptoRandomId() {
 
 participantInput.addEventListener(
     "keydown",
-    function(event) {
+    function(e){
 
-        if (event.key === "Enter") {
+        if(e.key==="Enter"){
             addParticipant();
         }
+
     }
 );
 
 
 prizeInput.addEventListener(
     "keydown",
-    function(event) {
+    function(e){
 
-        if (event.key === "Enter") {
+        if(e.key==="Enter"){
             addPrize();
         }
+
     }
 );
 
@@ -2428,9 +2517,11 @@ renderPrizes();
 
 renderHistory();
 
-updateHostParticipantSelect();
+updateHostParticipants();
 
-updateHostPrizeSelect();
+updateHostPrizes();
+
+drawWheel();
 
 </script>
 
