@@ -1,49 +1,1627 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>WebSocket Message Viewer</title>
-</head>
-<body>
-  <h3>WebSocket Messages</h3>
-  <pre id="output">Connecting...</pre>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prize Winner App</title>
 
-  <script>
-    const output = document.getElementById("output");
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-    function log(message) {
-      output.textContent += "\n" + message;
+:root {
+    --bg: #070707;
+    --card: #111111;
+    --card2: #171717;
+    --red: #ff1744;
+    --red2: #ff4569;
+    --gold: #ffd54a;
+    --white: #ffffff;
+    --muted: #999999;
+    --green: #28e07b;
+    --border: rgba(255,255,255,.09);
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background:
+        radial-gradient(circle at top, rgba(255, 0, 55, .13), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(255, 193, 7, .07), transparent 30%),
+        var(--bg);
+    color: var(--white);
+    min-height: 100vh;
+}
+
+button,
+input,
+select {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+.app {
+    width: 100%;
+    max-width: 1400px;
+    margin: auto;
+    padding: 20px;
+}
+
+/* HEADER */
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, var(--red), #85001e);
+    box-shadow: 0 0 25px rgba(255, 23, 68, .3);
+    font-size: 24px;
+}
+
+.logo h1 {
+    font-size: 22px;
+}
+
+.logo p {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 3px;
+}
+
+.header-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn {
+    border: 1px solid var(--border);
+    background: #151515;
+    color: white;
+    border-radius: 10px;
+    padding: 11px 15px;
+    transition: .2s;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    background: #202020;
+}
+
+.btn-danger {
+    background: rgba(255,23,68,.1);
+    color: #ff6684;
+    border-color: rgba(255,23,68,.25);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--red), #b9002d);
+    border: none;
+    font-weight: bold;
+}
+
+.btn-gold {
+    background: linear-gradient(135deg, #ffd54a, #e29d00);
+    color: #171000;
+    border: none;
+    font-weight: bold;
+}
+
+/* MAIN GRID */
+
+.main-grid {
+    display: grid;
+    grid-template-columns: 310px 1fr 310px;
+    gap: 18px;
+}
+
+.card {
+    background: linear-gradient(145deg, rgba(255,255,255,.045), rgba(255,255,255,.015));
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 18px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 15px 40px rgba(0,0,0,.25);
+}
+
+.card-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.card-title h2 {
+    font-size: 16px;
+}
+
+.count {
+    background: #242424;
+    padding: 4px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    color: var(--muted);
+}
+
+/* INPUT */
+
+.input-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+input,
+select {
+    width: 100%;
+    background: #0b0b0b;
+    border: 1px solid #292929;
+    color: white;
+    padding: 12px;
+    border-radius: 10px;
+    outline: none;
+}
+
+input:focus,
+select:focus {
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px rgba(255,23,68,.08);
+}
+
+.add-btn {
+    min-width: 46px;
+    border: none;
+    border-radius: 10px;
+    background: var(--red);
+    color: white;
+    font-size: 22px;
+}
+
+/* LIST */
+
+.list {
+    max-height: 430px;
+    overflow-y: auto;
+}
+
+.list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.list::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 10px;
+}
+
+.list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: rgba(255,255,255,.035);
+    border: 1px solid rgba(255,255,255,.05);
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 7px;
+}
+
+.list-item span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.remove {
+    width: 27px;
+    height: 27px;
+    border: none;
+    border-radius: 7px;
+    background: rgba(255,23,68,.12);
+    color: #ff5575;
+}
+
+.empty {
+    text-align: center;
+    padding: 35px 10px;
+    color: #666;
+    font-size: 13px;
+}
+
+/* CENTER */
+
+.draw-card {
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+}
+
+.draw-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.draw-header h2 {
+    font-size: 18px;
+}
+
+.status {
+    font-size: 11px;
+    padding: 7px 10px;
+    border-radius: 20px;
+    background: rgba(40,224,123,.1);
+    color: var(--green);
+}
+
+.display {
+    flex: 1;
+    min-height: 410px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,.08);
+    background:
+        radial-gradient(circle, rgba(255,23,68,.14), transparent 35%),
+        #090909;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.display::before,
+.display::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(255,23,68,.08);
+}
+
+.display::before {
+    width: 380px;
+    height: 380px;
+}
+
+.display::after {
+    width: 550px;
+    height: 550px;
+}
+
+.display-label {
+    color: var(--muted);
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 3px;
+    margin-bottom: 15px;
+    z-index: 2;
+}
+
+.draw-name {
+    font-size: clamp(35px, 6vw, 70px);
+    font-weight: 900;
+    text-align: center;
+    max-width: 90%;
+    word-break: break-word;
+    z-index: 2;
+    text-shadow: 0 0 30px rgba(255,23,68,.5);
+}
+
+.draw-prize {
+    margin-top: 18px;
+    color: var(--gold);
+    font-size: clamp(20px, 3vw, 32px);
+    font-weight: bold;
+    z-index: 2;
+}
+
+.spinning {
+    animation: pulse .13s infinite alternate;
+}
+
+@keyframes pulse {
+    from {
+        transform: scale(.96);
+        opacity: .65;
+    }
+    to {
+        transform: scale(1.04);
+        opacity: 1;
+    }
+}
+
+.winner-reveal {
+    animation: winner .8s ease;
+}
+
+@keyframes winner {
+    0% {
+        transform: scale(.5);
+        opacity: 0;
+    }
+    60% {
+        transform: scale(1.15);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.draw-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.draw-btn {
+    min-height: 55px;
+    border: none;
+    border-radius: 13px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.random-btn {
+    background: linear-gradient(135deg, var(--red), #a50029);
+    color: white;
+}
+
+.host-btn {
+    background: linear-gradient(135deg, #ffd54a, #d79800);
+    color: #1d1500;
+}
+
+/* SETTINGS */
+
+.settings {
+    margin-top: 15px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.setting label {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 6px;
+}
+
+/* WINNER HISTORY */
+
+.history {
+    max-height: 450px;
+    overflow-y: auto;
+}
+
+.history-item {
+    background: rgba(255,255,255,.035);
+    border: 1px solid rgba(255,255,255,.06);
+    padding: 12px;
+    border-radius: 11px;
+    margin-bottom: 8px;
+}
+
+.history-name {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.history-prize {
+    color: var(--gold);
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.history-mode {
+    color: var(--muted);
+    font-size: 10px;
+    margin-top: 6px;
+}
+
+/* MODE */
+
+.mode-box {
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 11px;
+    background: rgba(255,255,255,.035);
+    border: 1px solid var(--border);
+}
+
+.mode-box label {
+    font-size: 11px;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 7px;
+}
+
+.host-selection {
+    margin-top: 10px;
+    display: none;
+}
+
+.host-selection.show {
+    display: block;
+}
+
+.notice {
+    font-size: 11px;
+    color: #aaa;
+    line-height: 1.5;
+    margin-top: 10px;
+}
+
+.notice strong {
+    color: var(--gold);
+}
+
+/* CONFETTI */
+
+.confetti {
+    position: fixed;
+    width: 8px;
+    height: 14px;
+    top: -20px;
+    z-index: 9999;
+    pointer-events: none;
+    animation: fall linear forwards;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(110vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+/* MOBILE */
+
+@media(max-width: 1100px) {
+    .main-grid {
+        grid-template-columns: 1fr 1fr;
     }
 
-    const ws = new WebSocket("wss://eu-central-1-game6.spribegaming.com/BlueBox/websocket");
+    .draw-card {
+        grid-column: 1 / -1;
+        grid-row: 1;
+    }
+}
 
-    ws.onopen = () => {
-      log("✅ Connected");
+@media(max-width: 700px) {
+    .app {
+        padding: 12px;
+    }
+
+    .header {
+        align-items: flex-start;
+    }
+
+    .header-actions .btn {
+        padding: 9px;
+        font-size: 11px;
+    }
+
+    .main-grid {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .draw-card {
+        order: -1;
+        min-height: auto;
+    }
+
+    .display {
+        min-height: 390px;
+    }
+
+    .settings {
+        grid-template-columns: 1fr;
+    }
+
+    .draw-controls {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">🏆</div>
+            <div>
+                <h1>Prize Winner</h1>
+                <p>Professional Giveaway Selector</p>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <button class="btn" onclick="saveData()">💾 Save</button>
+            <button class="btn btn-danger" onclick="resetEverything()">Reset</button>
+        </div>
+    </header>
+
+
+    <main class="main-grid">
+
+        <!-- PARTICIPANTS -->
+        <section class="card">
+
+            <div class="card-title">
+                <h2>👥 Participants</h2>
+                <span class="count" id="participantCount">0</span>
+            </div>
+
+            <div class="input-group">
+                <input
+                    id="participantInput"
+                    type="text"
+                    placeholder="Enter participant name"
+                    autocomplete="off"
+                >
+                <button class="add-btn" onclick="addParticipant()">+</button>
+            </div>
+
+            <div class="list" id="participantList"></div>
+
+            <button
+                class="btn btn-danger"
+                style="width:100%; margin-top:10px;"
+                onclick="clearParticipants()"
+            >
+                Clear Participants
+            </button>
+
+        </section>
+
+
+        <!-- DRAW AREA -->
+        <section class="card draw-card">
+
+            <div class="draw-header">
+                <h2>🎰 Live Draw</h2>
+                <span class="status" id="status">READY</span>
+            </div>
+
+            <div class="display">
+
+                <div class="display-label" id="displayLabel">
+                    Ready for draw
+                </div>
+
+                <div class="draw-name" id="drawName">
+                    PRIZE WINNER
+                </div>
+
+                <div class="draw-prize" id="drawPrize">
+                    Add participants & prizes
+                </div>
+
+            </div>
+
+
+            <div class="settings">
+
+                <div class="setting">
+                    <label>NUMBER OF WINNERS</label>
+
+                    <select id="winnerCount">
+                        <option value="1">1 Winner</option>
+                        <option value="2">2 Winners</option>
+                        <option value="3">3 Winners</option>
+                        <option value="4">4 Winners</option>
+                        <option value="5">5 Winners</option>
+                        <option value="10">10 Winners</option>
+                    </select>
+                </div>
+
+                <div class="setting">
+                    <label>DRAW MODE</label>
+
+                    <select id="drawMode" onchange="changeMode()">
+                        <option value="random">🎲 Fair Random</option>
+                        <option value="host">👑 Host Choice</option>
+                    </select>
+                </div>
+
+            </div>
+
+
+            <div class="mode-box">
+
+                <label>DRAW INFORMATION</label>
+
+                <div id="randomInfo" class="notice">
+                    <strong>Fair Random:</strong>
+                    Winners are selected randomly from the available participants.
+                </div>
+
+                <div id="hostSelection" class="host-selection">
+
+                    <select id="hostParticipant">
+                        <option value="">Choose participant</option>
+                    </select>
+
+                    <div class="notice">
+                        Host Choice is clearly identified in the winner history.
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="draw-controls">
+
+                <button
+                    class="draw-btn random-btn"
+                    id="randomDrawBtn"
+                    onclick="startDraw()"
+                >
+                    🎲 START RANDOM DRAW
+                </button>
+
+                <button
+                    class="draw-btn host-btn"
+                    id="hostDrawBtn"
+                    onclick="startHostDraw()"
+                >
+                    👑 HOST CHOICE
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- PRIZES -->
+        <section class="card">
+
+            <div class="card-title">
+                <h2>🎁 Prizes</h2>
+                <span class="count" id="prizeCount">0</span>
+            </div>
+
+            <div class="input-group">
+                <input
+                    id="prizeInput"
+                    type="text"
+                    placeholder="e.g. iPhone 11"
+                    autocomplete="off"
+                >
+                <button class="add-btn" onclick="addPrize()">+</button>
+            </div>
+
+            <div class="list" id="prizeList"></div>
+
+            <button
+                class="btn btn-danger"
+                style="width:100%; margin-top:10px;"
+                onclick="clearPrizes()"
+            >
+                Clear Prizes
+            </button>
+
+        </section>
+
+    </main>
+
+
+    <!-- HISTORY -->
+    <section class="card" style="margin-top:18px;">
+
+        <div class="card-title">
+            <h2>🏆 Winner History</h2>
+
+            <button
+                class="btn btn-danger"
+                onclick="clearHistory()"
+            >
+                Clear History
+            </button>
+        </div>
+
+        <div class="history" id="history"></div>
+
+    </section>
+
+</div>
+
+
+<script>
+
+/* ============================================================
+   DATA
+============================================================ */
+
+let participants = [];
+let prizes = [];
+let winners = [];
+
+let drawing = false;
+
+
+/* ============================================================
+   ELEMENTS
+============================================================ */
+
+const participantInput = document.getElementById("participantInput");
+const prizeInput = document.getElementById("prizeInput");
+
+const participantList = document.getElementById("participantList");
+const prizeList = document.getElementById("prizeList");
+
+const participantCount = document.getElementById("participantCount");
+const prizeCount = document.getElementById("prizeCount");
+
+const drawName = document.getElementById("drawName");
+const drawPrize = document.getElementById("drawPrize");
+const displayLabel = document.getElementById("displayLabel");
+
+const statusEl = document.getElementById("status");
+
+const winnerCount = document.getElementById("winnerCount");
+const drawMode = document.getElementById("drawMode");
+
+const hostParticipant = document.getElementById("hostParticipant");
+
+const historyEl = document.getElementById("history");
+
+
+/* ============================================================
+   ADD PARTICIPANT
+============================================================ */
+
+function addParticipant() {
+
+    const name = participantInput.value.trim();
+
+    if (!name) {
+        alert("Please enter a participant name.");
+        return;
+    }
+
+    participants.push({
+        id: Date.now() + Math.random(),
+        name: name
+    });
+
+    participantInput.value = "";
+
+    renderParticipants();
+    updateHostSelect();
+    saveData();
+}
+
+
+/* ============================================================
+   ADD PRIZE
+============================================================ */
+
+function addPrize() {
+
+    const prize = prizeInput.value.trim();
+
+    if (!prize) {
+        alert("Please enter a prize.");
+        return;
+    }
+
+    prizes.push({
+        id: Date.now() + Math.random(),
+        name: prize
+    });
+
+    prizeInput.value = "";
+
+    renderPrizes();
+    saveData();
+}
+
+
+/* ============================================================
+   RENDER PARTICIPANTS
+============================================================ */
+
+function renderParticipants() {
+
+    participantList.innerHTML = "";
+
+    participantCount.textContent = participants.length;
+
+    if (participants.length === 0) {
+
+        participantList.innerHTML = `
+            <div class="empty">
+                No participants added yet.
+            </div>
+        `;
+
+        return;
+    }
+
+    participants.forEach((person, index) => {
+
+        const item = document.createElement("div");
+
+        item.className = "list-item";
+
+        item.innerHTML = `
+            <span>${index + 1}. ${escapeHTML(person.name)}</span>
+
+            <button
+                class="remove"
+                onclick="removeParticipant('${person.id}')"
+            >
+                ×
+            </button>
+        `;
+
+        participantList.appendChild(item);
+    });
+}
+
+
+/* ============================================================
+   RENDER PRIZES
+============================================================ */
+
+function renderPrizes() {
+
+    prizeList.innerHTML = "";
+
+    prizeCount.textContent = prizes.length;
+
+    if (prizes.length === 0) {
+
+        prizeList.innerHTML = `
+            <div class="empty">
+                No prizes added yet.
+            </div>
+        `;
+
+        return;
+    }
+
+    prizes.forEach((prize, index) => {
+
+        const item = document.createElement("div");
+
+        item.className = "list-item";
+
+        item.innerHTML = `
+            <span>${index + 1}. ${escapeHTML(prize.name)}</span>
+
+            <button
+                class="remove"
+                onclick="removePrize('${prize.id}')"
+            >
+                ×
+            </button>
+        `;
+
+        prizeList.appendChild(item);
+    });
+}
+
+
+/* ============================================================
+   REMOVE PARTICIPANT
+============================================================ */
+
+function removeParticipant(id) {
+
+    participants = participants.filter(
+        person => String(person.id) !== String(id)
+    );
+
+    renderParticipants();
+    updateHostSelect();
+    saveData();
+}
+
+
+/* ============================================================
+   REMOVE PRIZE
+============================================================ */
+
+function removePrize(id) {
+
+    prizes = prizes.filter(
+        prize => String(prize.id) !== String(id)
+    );
+
+    renderPrizes();
+    saveData();
+}
+
+
+/* ============================================================
+   CLEAR PARTICIPANTS
+============================================================ */
+
+function clearParticipants() {
+
+    if (!participants.length) return;
+
+    if (!confirm("Clear all participants?")) return;
+
+    participants = [];
+
+    renderParticipants();
+    updateHostSelect();
+    saveData();
+}
+
+
+/* ============================================================
+   CLEAR PRIZES
+============================================================ */
+
+function clearPrizes() {
+
+    if (!prizes.length) return;
+
+    if (!confirm("Clear all prizes?")) return;
+
+    prizes = [];
+
+    renderPrizes();
+    saveData();
+}
+
+
+/* ============================================================
+   MODE
+============================================================ */
+
+function changeMode() {
+
+    const mode = drawMode.value;
+
+    const hostBox = document.getElementById("hostSelection");
+    const randomInfo = document.getElementById("randomInfo");
+
+    if (mode === "host") {
+
+        hostBox.classList.add("show");
+        randomInfo.style.display = "none";
+
+    } else {
+
+        hostBox.classList.remove("show");
+        randomInfo.style.display = "block";
+    }
+}
+
+
+/* ============================================================
+   HOST SELECT
+============================================================ */
+
+function updateHostSelect() {
+
+    hostParticipant.innerHTML = `
+        <option value="">Choose participant</option>
+    `;
+
+    participants.forEach(person => {
+
+        const option = document.createElement("option");
+
+        option.value = person.id;
+        option.textContent = person.name;
+
+        hostParticipant.appendChild(option);
+    });
+}
+
+
+/* ============================================================
+   RANDOM DRAW
+============================================================ */
+
+async function startDraw() {
+
+    if (drawing) return;
+
+    if (participants.length === 0) {
+
+        alert("Add at least one participant first.");
+        return;
+    }
+
+    if (prizes.length === 0) {
+
+        alert("Add at least one prize first.");
+        return;
+    }
+
+    const requestedWinners = Number(winnerCount.value);
+
+    if (requestedWinners > participants.length) {
+
+        alert(
+            `You only have ${participants.length} participant(s), ` +
+            `so you cannot select ${requestedWinners} winners.`
+        );
+
+        return;
+    }
+
+    if (requestedWinners > prizes.length) {
+
+        alert(
+            `You only have ${prizes.length} prize(s), ` +
+            `so you cannot select ${requestedWinners} winners.`
+        );
+
+        return;
+    }
+
+    drawing = true;
+
+    setButtons(true);
+
+    statusEl.textContent = "DRAWING...";
+    statusEl.style.color = "#ffd54a";
+
+    let availableParticipants = [...participants];
+    let availablePrizes = [...prizes];
+
+    for (let i = 0; i < requestedWinners; i++) {
+
+        const winner = await animateRandomSelection(
+            availableParticipants
+        );
+
+        const prize = await animatePrizeSelection(
+            availablePrizes
+        );
+
+        recordWinner(
+            winner,
+            prize,
+            "Fair Random"
+        );
+
+        availableParticipants = availableParticipants.filter(
+            p => p.id !== winner.id
+        );
+
+        availablePrizes = availablePrizes.filter(
+            p => p.id !== prize.id
+        );
+
+        participants = participants.filter(
+            p => p.id !== winner.id
+        );
+
+        prizes = prizes.filter(
+            p => p.id !== prize.id
+        );
+
+        renderParticipants();
+        renderPrizes();
+        updateHostSelect();
+
+        await sleep(700);
+    }
+
+    statusEl.textContent = "DRAW COMPLETE";
+    statusEl.style.color = "#28e07b";
+
+    drawing = false;
+
+    setButtons(false);
+
+    saveData();
+}
+
+
+/* ============================================================
+   RANDOM NAME ANIMATION
+============================================================ */
+
+function animateRandomSelection(list) {
+
+    return new Promise(resolve => {
+
+        let elapsed = 0;
+
+        const duration = 3200;
+
+        displayLabel.textContent = "Selecting winner...";
+        drawName.classList.add("spinning");
+        drawPrize.textContent = "";
+
+        const timer = setInterval(() => {
+
+            const random =
+                list[Math.floor(Math.random() * list.length)];
+
+            drawName.textContent = random.name;
+
+            elapsed += 100;
+
+            if (elapsed >= duration) {
+
+                clearInterval(timer);
+
+                const winner =
+                    list[Math.floor(Math.random() * list.length)];
+
+                drawName.classList.remove("spinning");
+                drawName.classList.add("winner-reveal");
+
+                drawName.textContent = winner.name;
+
+                setTimeout(() => {
+                    drawName.classList.remove("winner-reveal");
+                    resolve(winner);
+                }, 500);
+            }
+
+        }, 100);
+    });
+}
+
+
+/* ============================================================
+   RANDOM PRIZE ANIMATION
+============================================================ */
+
+function animatePrizeSelection(list) {
+
+    return new Promise(resolve => {
+
+        let elapsed = 0;
+
+        const duration = 2200;
+
+        displayLabel.textContent = "Selecting prize...";
+        drawPrize.classList.add("spinning");
+
+        const timer = setInterval(() => {
+
+            const random =
+                list[Math.floor(Math.random() * list.length)];
+
+            drawPrize.textContent = "🎁 " + random.name;
+
+            elapsed += 100;
+
+            if (elapsed >= duration) {
+
+                clearInterval(timer);
+
+                const prize =
+                    list[Math.floor(Math.random() * list.length)];
+
+                drawPrize.classList.remove("spinning");
+
+                drawPrize.textContent =
+                    "🎁 " + prize.name;
+
+                displayLabel.textContent =
+                    "WINNER SELECTED";
+
+                celebrate();
+
+                setTimeout(() => {
+                    resolve(prize);
+                }, 500);
+            }
+
+        }, 100);
+    });
+}
+
+
+/* ============================================================
+   HOST DRAW
+============================================================ */
+
+async function startHostDraw() {
+
+    if (drawing) return;
+
+    if (participants.length === 0) {
+
+        alert("Add participants first.");
+        return;
+    }
+
+    if (prizes.length === 0) {
+
+        alert("Add prizes first.");
+        return;
+    }
+
+    const selectedId = hostParticipant.value;
+
+    if (!selectedId) {
+
+        alert("Choose the participant for Host Choice.");
+        return;
+    }
+
+    const selectedWinner =
+        participants.find(
+            person => String(person.id) === String(selectedId)
+        );
+
+    if (!selectedWinner) return;
+
+    drawing = true;
+
+    setButtons(true);
+
+    statusEl.textContent = "HOST CHOICE";
+    statusEl.style.color = "#ffd54a";
+
+    /* Prize is still randomly selected */
+    const prize = await animatePrizeSelection(prizes);
+
+    drawName.classList.add("winner-reveal");
+
+    drawName.textContent = selectedWinner.name;
+
+    displayLabel.textContent = "HOST CHOICE";
+
+    recordWinner(
+        selectedWinner,
+        prize,
+        "Host Choice"
+    );
+
+    drawName.classList.remove("winner-reveal");
+
+    participants = participants.filter(
+        person => person.id !== selectedWinner.id
+    );
+
+    prizes = prizes.filter(
+        item => item.id !== prize.id
+    );
+
+    renderParticipants();
+    renderPrizes();
+    updateHostSelect();
+
+    statusEl.textContent = "DRAW COMPLETE";
+    statusEl.style.color = "#28e07b";
+
+    drawing = false;
+
+    setButtons(false);
+
+    saveData();
+}
+
+
+/* ============================================================
+   RECORD WINNER
+============================================================ */
+
+function recordWinner(person, prize, mode) {
+
+    winners.unshift({
+        id: Date.now() + Math.random(),
+        name: person.name,
+        prize: prize.name,
+        mode: mode,
+        time: new Date().toLocaleString()
+    });
+
+    renderHistory();
+}
+
+
+/* ============================================================
+   HISTORY
+============================================================ */
+
+function renderHistory() {
+
+    historyEl.innerHTML = "";
+
+    if (winners.length === 0) {
+
+        historyEl.innerHTML = `
+            <div class="empty">
+                No winners selected yet.
+            </div>
+        `;
+
+        return;
+    }
+
+    winners.forEach((winner, index) => {
+
+        const item = document.createElement("div");
+
+        item.className = "history-item";
+
+        item.innerHTML = `
+            <div class="history-name">
+                🏆 ${index + 1}. ${escapeHTML(winner.name)}
+            </div>
+
+            <div class="history-prize">
+                🎁 ${escapeHTML(winner.prize)}
+            </div>
+
+            <div class="history-mode">
+                ${escapeHTML(winner.mode)} • ${escapeHTML(winner.time)}
+            </div>
+        `;
+
+        historyEl.appendChild(item);
+    });
+}
+
+
+/* ============================================================
+   CLEAR HISTORY
+============================================================ */
+
+function clearHistory() {
+
+    if (!winners.length) return;
+
+    if (!confirm("Clear winner history?")) return;
+
+    winners = [];
+
+    renderHistory();
+    saveData();
+}
+
+
+/* ============================================================
+   CONFETTI
+============================================================ */
+
+function celebrate() {
+
+    for (let i = 0; i < 70; i++) {
+
+        const piece = document.createElement("div");
+
+        piece.className = "confetti";
+
+        piece.style.left =
+            Math.random() * 100 + "vw";
+
+        piece.style.animationDuration =
+            (2 + Math.random() * 3) + "s";
+
+        piece.style.transform =
+            `rotate(${Math.random() * 360}deg)`;
+
+        const colors = [
+            "#ff1744",
+            "#ffd54a",
+            "#ffffff",
+            "#28e07b",
+            "#5b8cff"
+        ];
+
+        piece.style.background =
+            colors[Math.floor(Math.random() * colors.length)];
+
+        document.body.appendChild(piece);
+
+        setTimeout(() => {
+            piece.remove();
+        }, 5500);
+    }
+}
+
+
+/* ============================================================
+   BUTTON STATE
+============================================================ */
+
+function setButtons(disabled) {
+
+    document.getElementById("randomDrawBtn").disabled = disabled;
+    document.getElementById("hostDrawBtn").disabled = disabled;
+    winnerCount.disabled = disabled;
+    drawMode.disabled = disabled;
+    hostParticipant.disabled = disabled;
+
+    document.getElementById("randomDrawBtn").style.opacity =
+        disabled ? ".5" : "1";
+
+    document.getElementById("hostDrawBtn").style.opacity =
+        disabled ? ".5" : "1";
+}
+
+
+/* ============================================================
+   SAVE DATA
+============================================================ */
+
+function saveData() {
+
+    const data = {
+        participants,
+        prizes,
+        winners
     };
 
-    ws.onmessage = (event) => {
-      log("\n📨 Incoming message:");
-      
-      if (typeof event.data === "string") {
-        log(event.data);
-      } else if (event.data instanceof Blob) {
-        log(`[Binary Blob: ${event.data.size} bytes]`);
+    localStorage.setItem(
+        "prizeWinnerAppData",
+        JSON.stringify(data)
+    );
+}
 
-        event.data.text().then(text => {
-          log(text);
-        });
-      } else if (event.data instanceof ArrayBuffer) {
-        log(`[Binary data: ${event.data.byteLength} bytes]`);
-      }
-    };
 
-    ws.onerror = () => {
-      log("❌ WebSocket error");
-    };
+/* ============================================================
+   LOAD DATA
+============================================================ */
 
-    ws.onclose = (event) => {
-      log(`\n🔌 Closed — code: ${event.code}`);
-    };
-  </script>
+function loadData() {
+
+    try {
+
+        const saved =
+            localStorage.getItem("prizeWinnerAppData");
+
+        if (!saved) return;
+
+        const data = JSON.parse(saved);
+
+        participants =
+            Array.isArray(data.participants)
+                ? data.participants
+                : [];
+
+        prizes =
+            Array.isArray(data.prizes)
+                ? data.prizes
+                : [];
+
+        winners =
+            Array.isArray(data.winners)
+                ? data.winners
+                : [];
+
+    } catch (error) {
+
+        console.error("Could not load saved data.", error);
+    }
+}
+
+
+/* ============================================================
+   SAVE BUTTON
+============================================================ */
+
+function saveDataMessage() {
+
+    saveData();
+
+    alert("Your giveaway data has been saved.");
+}
+
+
+/* ============================================================
+   RESET EVERYTHING
+============================================================ */
+
+function resetEverything() {
+
+    if (
+        !confirm(
+            "This will remove participants, prizes and winner history. Continue?"
+        )
+    ) {
+        return;
+    }
+
+    participants = [];
+    prizes = [];
+    winners = [];
+
+    localStorage.removeItem("prizeWinnerAppData");
+
+    drawName.textContent = "PRIZE WINNER";
+    drawPrize.textContent = "Add participants & prizes";
+    displayLabel.textContent = "Ready for draw";
+
+    statusEl.textContent = "READY";
+
+    renderParticipants();
+    renderPrizes();
+    renderHistory();
+    updateHostSelect();
+}
+
+
+/* ============================================================
+   UTILITIES
+============================================================ */
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+function escapeHTML(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+/* ============================================================
+   ENTER KEY SUPPORT
+============================================================ */
+
+participantInput.addEventListener("keydown", function(e) {
+
+    if (e.key === "Enter") {
+        addParticipant();
+    }
+});
+
+
+prizeInput.addEventListener("keydown", function(e) {
+
+    if (e.key === "Enter") {
+        addPrize();
+    }
+});
+
+
+/* ============================================================
+   INITIALIZE
+============================================================ */
+
+loadData();
+
+renderParticipants();
+renderPrizes();
+renderHistory();
+updateHostSelect();
+
+</script>
+
 </body>
 </html>
