@@ -301,7 +301,7 @@ input:focus,select:focus{
     height:100%;
     border-radius:50%;
     transform:rotate(0deg);
-    transition:transform 5.5s cubic-bezier(.12,.72,.08,1);
+    transition:transform 8.2s cubic-bezier(.10,.80,.05,1);
     box-shadow:
         0 0 0 8px #1b1b1b,
         0 0 0 11px #ffd54a,
@@ -340,11 +340,12 @@ input:focus,select:focus{
     backdrop-filter:blur(8px);
     z-index:50;
     text-align:center;
+    cursor:pointer;
 }
 
 .winnerOverlay.show{
     display:flex;
-    animation:overlayIn .4s ease;
+    animation:overlayIn.4s ease;
 }
 
 @keyframes overlayIn{
@@ -358,7 +359,7 @@ input:focus,select:focus{
 
 .winnerEmoji{
     font-size:60px;
-    animation:bounce .8s ease infinite alternate;
+    animation:bounce.8s ease infinite alternate;
 }
 
 @keyframes bounce{
@@ -617,11 +618,11 @@ input[type=file]{
 
 @media(max-width:1100px){
 
-    .layout{
+   .layout{
         grid-template-columns:1fr 1fr;
     }
 
-    .wheelCard{
+   .wheelCard{
         grid-column:1/-1;
         grid-row:1;
     }
@@ -629,52 +630,52 @@ input[type=file]{
 
 @media(max-width:700px){
 
-    .app{
+   .app{
         padding:10px;
     }
 
-    .header{
+   .header{
         align-items:flex-start;
     }
 
-    .logo h1{
+   .logo h1{
         font-size:18px;
     }
 
-    .logo p{
+   .logo p{
         font-size:9px;
     }
 
-    .headerButtons .btn{
+   .headerButtons.btn{
         padding:8px;
         font-size:9px;
     }
 
-    .layout{
+   .layout{
         display:flex;
         flex-direction:column;
     }
 
-    .wheelCard{
+   .wheelCard{
         order:-1;
         min-height:auto;
     }
 
-    .wheelArea{
+   .wheelArea{
         min-height:450px;
     }
 
-    .wheelCenter{
+   .wheelCenter{
         width:70px;
         height:70px;
         font-size:9px;
     }
 
-    .hostGrid{
+   .hostGrid{
         grid-template-columns:1fr;
     }
 
-    .prizeGallery{
+   .prizeGallery{
         grid-template-columns:repeat(2,1fr);
     }
 }
@@ -722,11 +723,9 @@ input[type=file]{
 
 </header>
 
-
 <!-- MAIN -->
 
 <main class="layout">
-
 
 <!-- PARTICIPANTS -->
 
@@ -745,7 +744,6 @@ input[type=file]{
 
     </div>
 
-
     <div class="inputRow">
 
         <input
@@ -763,12 +761,10 @@ input[type=file]{
 
     </div>
 
-
     <div
         class="list"
         id="participantList"
     ></div>
-
 
     <button
         class="btn danger"
@@ -779,7 +775,6 @@ input[type=file]{
     </button>
 
 </section>
-
 
 <!-- WHEEL -->
 
@@ -798,7 +793,6 @@ input[type=file]{
 
     </div>
 
-
     <div class="wheelArea">
 
         <div class="pointer"></div>
@@ -816,7 +810,6 @@ input[type=file]{
             </div>
 
         </div>
-
 
         <div
             class="winnerOverlay"
@@ -844,7 +837,6 @@ input[type=file]{
         </div>
 
     </div>
-
 
     <div class="controls">
 
@@ -880,7 +872,6 @@ input[type=file]{
 
         </div>
 
-
         <button
             class="startBtn"
             id="startBtn"
@@ -892,7 +883,6 @@ input[type=file]{
     </div>
 
 </section>
-
 
 <!-- PRIZES -->
 
@@ -911,7 +901,6 @@ input[type=file]{
 
     </div>
 
-
     <div class="inputRow">
 
         <input
@@ -929,7 +918,6 @@ input[type=file]{
 
     </div>
 
-
     <label
         class="uploadLabel"
         for="prizeImageInput"
@@ -943,12 +931,10 @@ input[type=file]{
         accept="image/*"
     >
 
-
     <div
         class="prizeGallery"
         id="prizeGallery"
     ></div>
-
 
     <button
         class="btn danger"
@@ -961,7 +947,6 @@ input[type=file]{
 </section>
 
 </main>
-
 
 <!-- HISTORY -->
 
@@ -980,14 +965,12 @@ input[type=file]{
 
     </div>
 
-
     <div
         class="history"
         id="history"
     ></div>
 
 </section>
-
 
 <!-- HOST CHOICE AT BOTTOM -->
 
@@ -1002,7 +985,6 @@ input[type=file]{
         </span>
 
     </div>
-
 
     <div class="hostGrid">
 
@@ -1022,7 +1004,6 @@ input[type=file]{
 
         </div>
 
-
         <div>
 
             <label>
@@ -1041,7 +1022,6 @@ input[type=file]{
 
     </div>
 
-
     <button
         class="hostButton"
         onclick="hostChoice()"
@@ -1049,7 +1029,6 @@ input[type=file]{
     >
         👑 USE HOST CHOICE
     </button>
-
 
     <div class="hostNote">
         Host Choice is a separate selection mode and is recorded
@@ -1059,7 +1038,6 @@ input[type=file]{
 </section>
 
 </div>
-
 
 <script>
 
@@ -1075,7 +1053,6 @@ let drawing = false;
 let wheelRotation = 0;
 
 let pendingPrizeImage = null;
-
 
 /* ============================================================
    ELEMENTS
@@ -1138,7 +1115,6 @@ const winnerName =
 const winnerPrize =
     document.getElementById("winnerPrize");
 
-
 /* ============================================================
    IMAGE SELECTION
 ============================================================ */
@@ -1169,7 +1145,6 @@ prizeImageInput.addEventListener(
         reader.readAsDataURL(file);
     }
 );
-
 
 /* ============================================================
    ADD PARTICIPANT
@@ -1207,7 +1182,6 @@ function addParticipant(){
 
     saveData();
 }
-
 
 /* ============================================================
    ADD PRIZE
@@ -1250,7 +1224,6 @@ function addPrize(){
 
     saveData();
 }
-
 
 /* ============================================================
    PARTICIPANTS
@@ -1308,12 +1281,11 @@ function renderParticipants(){
     );
 }
 
-
 function removeParticipant(id){
 
     participants =
         participants.filter(
-            p => p.id !== id
+            p => p.id!== id
         );
 
     renderParticipants();
@@ -1325,14 +1297,13 @@ function removeParticipant(id){
     saveData();
 }
 
-
 function clearParticipants(){
 
     if(!participants.length)
         return;
 
     if(
-        !confirm(
+       !confirm(
             "Clear all participants?"
         )
     )
@@ -1348,7 +1319,6 @@ function clearParticipants(){
 
     saveData();
 }
-
 
 /* ============================================================
    PRIZES
@@ -1435,12 +1405,11 @@ function renderPrizes(){
     );
 }
 
-
 function removePrize(id){
 
     prizes =
         prizes.filter(
-            p => p.id !== id
+            p => p.id!== id
         );
 
     renderPrizes();
@@ -1450,14 +1419,13 @@ function removePrize(id){
     saveData();
 }
 
-
 function clearPrizes(){
 
     if(!prizes.length)
         return;
 
     if(
-        !confirm(
+       !confirm(
             "Clear all prizes?"
         )
     )
@@ -1472,9 +1440,8 @@ function clearPrizes(){
     saveData();
 }
 
-
 /* ============================================================
-   DRAW WHEEL
+   DRAW WHEEL - IMPROVED BOLDER TEXT
 ============================================================ */
 
 function drawWheel(){
@@ -1549,7 +1516,6 @@ function drawWheel(){
     const slice =
         (Math.PI*2)/total;
 
-
     const colors = [
 
         "#ff1744",
@@ -1564,7 +1530,6 @@ function drawWheel(){
         "#ff1744"
 
     ];
-
 
     for(
         let i=0;
@@ -1611,8 +1576,7 @@ function drawWheel(){
 
         ctx.stroke();
 
-
-        /* NAME */
+        /* NAME - BOLDER & SMARTER */
 
         ctx.save();
 
@@ -1631,44 +1595,36 @@ function drawWheel(){
         ctx.textBaseline =
             "middle";
 
-        ctx.fillStyle =
-            "#fff";
+        let fontSize;
+        if(total > 25) fontSize = 16;
+        else if(total > 18) fontSize = 19;
+        else if(total > 12) fontSize = 22;
+        else if(total > 8) fontSize = 26;
+        else if(total > 4) fontSize = 30;
+        else fontSize = 34;
 
-        let fontSize =
-            total > 15 ? 18 :
-            total > 10 ? 21 :
-            25;
+        let name = participants[i].name;
 
-        ctx.font =
-            "bold "+fontSize+"px Arial";
-
-        let name =
-            participants[i].name;
-
-        if(name.length > 16){
-
-            name =
-                name.substring(
-                    0,
-                    15
-                )+"…";
+        // smarter truncation based on count
+        let maxLen = total > 15? 14 : total > 8? 18 : 22;
+        if(name.length > maxLen){
+            name = name.substring(0, maxLen-1)+"…";
         }
 
-        ctx.shadowColor =
-            "rgba(0,0,0,.7)";
+        // extra bold + outline for clarity
+        ctx.font = `900 ${fontSize}px Arial, Helvetica, sans-serif`;
+        ctx.lineJoin = "round";
+        ctx.strokeStyle = "rgba(0,0,0,0.85)";
+        ctx.lineWidth = fontSize * 0.22;
+        ctx.strokeText(name, radius-28, 0);
 
-        ctx.shadowBlur =
-            5;
-
-        ctx.fillText(
-            name,
-            radius-25,
-            0
-        );
+        ctx.fillStyle = "#fff";
+        ctx.shadowColor = "rgba(0,0,0,.8)";
+        ctx.shadowBlur = 8;
+        ctx.fillText(name, radius-28, 0);
 
         ctx.restore();
     }
-
 
     /* OUTER RING */
 
@@ -1692,9 +1648,8 @@ function drawWheel(){
 
 }
 
-
 /* ============================================================
-   START RANDOM DRAW
+   START RANDOM DRAW - LONGER SUSPENSE + STAY OPEN
 ============================================================ */
 
 async function startDraw(){
@@ -1749,7 +1704,6 @@ async function startDraw(){
         return;
     }
 
-
     drawing = true;
 
     startBtn.disabled = true;
@@ -1762,6 +1716,8 @@ async function startDraw(){
     statusEl.style.color =
         "#ffd54a";
 
+    // ensure overlay hidden at start
+    hideWinner();
 
     for(
         let i=0;
@@ -1775,19 +1731,16 @@ async function startDraw(){
         )
             break;
 
-
         const winnerIndex =
             Math.floor(
                 Math.random() *
                 participants.length
             );
 
-
         const winner =
             participants[
                 winnerIndex
             ];
-
 
         const prizeIndex =
             Math.floor(
@@ -1795,23 +1748,19 @@ async function startDraw(){
                 prizes.length
             );
 
-
         const prize =
             prizes[
                 prizeIndex
             ];
 
-
         await spinWheelToIndex(
             winnerIndex
         );
-
 
         showWinner(
             winner,
             prize
         );
-
 
         recordWinner(
             winner,
@@ -1819,18 +1768,15 @@ async function startDraw(){
             "Fair Random"
         );
 
-
         participants.splice(
             winnerIndex,
             1
         );
 
-
         prizes.splice(
             prizeIndex,
             1
         );
-
 
         renderParticipants();
 
@@ -1842,11 +1788,14 @@ async function startDraw(){
 
         drawWheel();
 
-        await sleep(1600);
-
-        hideWinner();
+        if(i < count - 1){
+            // if multiple winners, wait then auto close to spin next
+            await sleep(3800);
+            hideWinner();
+            await sleep(900);
+        }
+        // last winner stays open - will close only when typing new names
     }
-
 
     drawing = false;
 
@@ -1863,9 +1812,8 @@ async function startDraw(){
     saveData();
 }
 
-
 /* ============================================================
-   WHEEL SPIN
+   WHEEL SPIN - LONGER
 ============================================================ */
 
 function spinWheelToIndex(index){
@@ -1879,42 +1827,30 @@ function spinWheelToIndex(index){
             const slice =
                 360/total;
 
-
-            /*
-                The selected segment is placed
-                under the pointer at the top.
-            */
-
             const segmentCenter =
                 index*slice +
                 slice/2;
-
 
             const target =
                 360 -
                 segmentCenter;
 
-
             const extra =
-                360*7;
-
+                360*10 + Math.random()*360;
 
             wheelRotation +=
                 extra + target;
 
-
             canvas.style.transform =
                 `rotate(${wheelRotation}deg)`;
 
-
             setTimeout(
                 resolve,
-                5600
+                8300
             );
         }
     );
 }
-
 
 /* ============================================================
    SHOW WINNER
@@ -1938,7 +1874,6 @@ function showWinner(
     celebrate();
 }
 
-
 function hideWinner(){
 
     winnerOverlay.classList.remove(
@@ -1946,6 +1881,24 @@ function hideWinner(){
     );
 }
 
+// NEW: Close winner when you start typing new names + click overlay
+participantInput.addEventListener("input", function(){
+    if(winnerOverlay.classList.contains("show")){
+        hideWinner();
+    }
+});
+participantInput.addEventListener("focus", function(){
+    if(winnerOverlay.classList.contains("show")){
+        // small delay so you can see it's intentional
+        // hide on focus after 250ms if user intends to type
+        setTimeout(()=> {
+            if(document.activeElement === participantInput){
+                // don't auto hide on just focus, only on input - keep for UX
+            }
+        },250);
+    }
+});
+winnerOverlay.addEventListener("click", hideWinner);
 
 /* ============================================================
    HOST CHOICE
@@ -1980,7 +1933,6 @@ function updateHostParticipants(){
     );
 }
 
-
 function updateHostPrizes(){
 
     hostPrize.innerHTML = `
@@ -2009,7 +1961,6 @@ function updateHostPrizes(){
         }
     );
 }
-
 
 async function hostChoice(){
 
@@ -2050,9 +2001,8 @@ async function hostChoice(){
             p => p.id === prizeId
         );
 
-    if(!person || !prize)
+    if(!person ||!prize)
         return;
-
 
     drawing = true;
 
@@ -2065,13 +2015,6 @@ async function hostChoice(){
 
     statusEl.style.color =
         "#ffd54a";
-
-
-    /*
-        Presentation animation only.
-        The selected host participant/prize
-        are then shown explicitly.
-    */
 
     await sleep(1200);
 
@@ -2086,17 +2029,15 @@ async function hostChoice(){
         "Host Choice"
     );
 
-
     participants =
         participants.filter(
-            p => p.id !== person.id
+            p => p.id!== person.id
         );
 
     prizes =
         prizes.filter(
-            p => p.id !== prize.id
+            p => p.id!== prize.id
         );
-
 
     renderParticipants();
 
@@ -2110,11 +2051,7 @@ async function hostChoice(){
 
     saveData();
 
-
-    await sleep(1800);
-
-    hideWinner();
-
+    // stays open until you type new name or click winner
     drawing = false;
 
     startBtn.disabled = false;
@@ -2127,7 +2064,6 @@ async function hostChoice(){
     statusEl.style.color =
         "#28e07b";
 }
-
 
 /* ============================================================
    HISTORY
@@ -2150,13 +2086,12 @@ function recordWinner(
         mode:mode,
 
         time:new Date()
-            .toLocaleString()
+           .toLocaleString()
 
     });
 
     renderHistory();
 }
-
 
 function renderHistory(){
 
@@ -2172,7 +2107,6 @@ function renderHistory(){
 
         return;
     }
-
 
     winners.forEach(
         function(item,index){
@@ -2217,14 +2151,13 @@ function renderHistory(){
     );
 }
 
-
 function clearHistory(){
 
     if(!winners.length)
         return;
 
     if(
-        !confirm(
+       !confirm(
             "Clear winner history?"
         )
     )
@@ -2236,7 +2169,6 @@ function clearHistory(){
 
     saveData();
 }
-
 
 /* ============================================================
    CONFETTI
@@ -2253,7 +2185,6 @@ function celebrate(){
         "#4da3ff"
 
     ];
-
 
     for(
         let i=0;
@@ -2290,14 +2221,12 @@ function celebrate(){
             piece
         );
 
-
         setTimeout(
             () => piece.remove(),
             5500
         );
     }
 }
-
 
 /* ============================================================
    STORAGE
@@ -2326,7 +2255,6 @@ function saveData(show=false){
     }
 }
 
-
 function loadData(){
 
     try{
@@ -2346,21 +2274,21 @@ function loadData(){
             Array.isArray(
                 data.participants
             )
-            ? data.participants
+           ? data.participants
             : [];
 
         prizes =
             Array.isArray(
                 data.prizes
             )
-            ? data.prizes
+           ? data.prizes
             : [];
 
         winners =
             Array.isArray(
                 data.winners
             )
-            ? data.winners
+           ? data.winners
             : [];
 
     }catch(error){
@@ -2370,7 +2298,6 @@ function loadData(){
     }
 }
 
-
 /* ============================================================
    RESET
 ============================================================ */
@@ -2378,7 +2305,7 @@ function loadData(){
 function resetAll(){
 
     if(
-        !confirm(
+       !confirm(
             "Delete all participants, prizes and history?"
         )
     )
@@ -2414,7 +2341,6 @@ function resetAll(){
     hideWinner();
 }
 
-
 /* ============================================================
    UTILITIES
 ============================================================ */
@@ -2430,7 +2356,6 @@ function sleep(ms){
     );
 }
 
-
 function uid(){
 
     if(
@@ -2445,37 +2370,35 @@ function uid(){
         Date.now()+
         "-" +
         Math.random()
-            .toString(36)
-            .substring(2)
+           .toString(36)
+           .substring(2)
     );
 }
-
 
 function escapeHTML(value){
 
     return String(value)
-        .replace(
+       .replace(
             /&/g,
             "&amp;"
         )
-        .replace(
+       .replace(
             /</g,
             "&lt;"
         )
-        .replace(
+       .replace(
             />/g,
             "&gt;"
         )
-        .replace(
+       .replace(
             /"/g,
             "&quot;"
         )
-        .replace(
+       .replace(
             /'/g,
             "&#039;"
         );
 }
-
 
 /* ============================================================
    ENTER KEY
@@ -2492,7 +2415,6 @@ participantInput.addEventListener(
     }
 );
 
-
 prizeInput.addEventListener(
     "keydown",
     function(e){
@@ -2503,7 +2425,6 @@ prizeInput.addEventListener(
 
     }
 );
-
 
 /* ============================================================
    INITIALIZE
