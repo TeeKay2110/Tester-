@@ -588,11 +588,30 @@ input[type=file]{
     font-weight:900;
 }
 
+.hostButton:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+}
+
 .hostNote{
     margin-top:11px;
     color:#666;
     font-size:10px;
     line-height:1.5;
+}
+
+/* HOST MODE ACTIVE */
+
+.hostModeActive{
+    border-color:rgba(255,213,74,.45);
+    box-shadow:
+        0 0 25px rgba(255,213,74,.08),
+        0 15px 50px rgba(0,0,0,.25);
+}
+
+.hostModeActive .hostBadge{
+    background:rgba(255,213,74,.22);
+    color:#fff;
 }
 
 /* CONFETTI */
@@ -972,15 +991,18 @@ input[type=file]{
 
 </section>
 
-<!-- HOST CHOICE AT BOTTOM -->
+<!-- HOST CHOICE -->
 
-<section class="card hostCard">
+<section class="card hostCard" id="hostCard">
 
     <div class="hostHeader">
 
         <h2>👑 Host Choice</h2>
 
-        <span class="hostBadge">
+        <span
+            class="hostBadge"
+            id="hostBadge"
+        >
             HOST ONLY
         </span>
 
@@ -1031,8 +1053,9 @@ input[type=file]{
     </button>
 
     <div class="hostNote">
-        Host Choice is a separate selection mode and is recorded
-        separately in the winner history.
+        Select a participant and prize, then press USE HOST CHOICE.
+        The next spin will land on your selected participant.
+        Prize 7 and above can only be used through Host Choice.
     </div>
 
 </section>
@@ -1050,7 +1073,26 @@ let prizes = [];
 let winners = [];
 
 let drawing = false;
+
+/*
+   Current physical wheel rotation.
+
+   We keep this value because the wheel can spin many times.
+*/
 let wheelRotation = 0;
+
+/*
+   Host Choice pending data.
+
+   When the host chooses a participant and prize,
+   NOTHING is declared yet.
+
+   The selection is only stored here.
+
+   The actual winner is declared after
+   the wheel physically spins.
+*/
+let hostChoicePending = null;
 
 let pendingPrizeImage = null;
 
@@ -1091,6 +1133,12 @@ const startBtn =
 const hostButton =
     document.getElementById("hostButton");
 
+const hostCard =
+    document.getElementById("hostCard");
+
+const hostBadge =
+    document.getElementById("hostBadge");
+
 const statusEl =
     document.getElementById("status");
 
@@ -1127,7 +1175,9 @@ prizeImageInput.addEventListener(
             this.files[0];
 
         if(!file){
+
             pendingPrizeImage = null;
+
             return;
         }
 
@@ -1163,6 +1213,15 @@ function addParticipant(){
 
         return;
     }
+
+    /*
+       If a Host Choice was waiting,
+       adding a new participant does not
+       cancel it automatically.
+
+       The host can continue with the
+       selected participant.
+    */
 
     participants.push({
 
@@ -1283,6 +1342,23 @@ function renderParticipants(){
 
 function removeParticipant(id){
 
+    /*
+       Do not allow deleting the participant
+       currently selected for Host Choice.
+    */
+
+    if(
+        hostChoicePending &&
+        hostChoicePending.personId === id
+    ){
+
+        alert(
+            "This participant is currently selected for Host Choice. Cancel the Host Choice first."
+        );
+
+        return;
+    }
+
     participants =
         participants.filter(
             p => p.id !== id
@@ -1299,6 +1375,9 @@ function removeParticipant(id){
 
 function clearParticipants(){
 
+    if(drawing)
+        return;
+
     if(!participants.length)
         return;
 
@@ -1310,6 +1389,13 @@ function clearParticipants(){
         return;
 
     participants = [];
+
+    /*
+       Clearing participants also cancels
+       any pending Host Choice.
+    */
+
+    cancelHostChoice();
 
     renderParticipants();
 
@@ -1407,6 +1493,23 @@ function renderPrizes(){
 
 function removePrize(id){
 
+    /*
+       Do not remove the prize currently
+       selected for Host Choice.
+    */
+
+    if(
+        hostChoicePending &&
+        hostChoicePending.prizeId === id
+    ){
+
+        alert(
+            "This prize is currently selected for Host Choice. Cancel the Host Choice first."
+        );
+
+        return;
+    }
+
     prizes =
         prizes.filter(
             p => p.id !== id
@@ -1421,6 +1524,9 @@ function removePrize(id){
 
 function clearPrizes(){
 
+    if(drawing)
+        return;
+
     if(!prizes.length)
         return;
 
@@ -1432,6 +1538,13 @@ function clearPrizes(){
         return;
 
     prizes = [];
+
+    /*
+       Clearing prizes also cancels
+       any pending Host Choice.
+    */
+
+    cancelHostChoice();
 
     renderPrizes();
 
@@ -1575,6 +1688,10 @@ function drawWheel(){
             4;
 
         ctx.stroke();
+
+        /* ============================================
+           BIGGER NAME TEXT
+        ============================================ */
 
         ctx.save();
 
@@ -1730,6 +1847,8 @@ function drawWheel(){
         ctx.restore();
     }
 
+    /* OUTER RING */
+
     ctx.beginPath();
 
     ctx.arc(
@@ -1747,7 +1866,6 @@ function drawWheel(){
         10;
 
     ctx.stroke();
-
 }
 
 /* ============================================================
@@ -1764,8 +1882,8 @@ function drawWheel(){
     Prize 5 = Extremely Rare
     Prize 6 = Ultimately Rare
 
-    Prize 7 and above have ZERO chance
-    during a normal random draw.
+    Prize 7 and every prize after Prize 7
+    have ZERO chance in the normal random draw.
 
     They are ONLY available through Host Choice.
 
@@ -1777,9 +1895,6 @@ function drawWheel(){
     Prize 4 = 10
     Prize 5 = 6
     Prize 6 = 4
-
-    If fewer than 6 prizes exist,
-    the available weights are normalized.
 */
 
 function chooseRandomPrize(){
@@ -1798,7 +1913,7 @@ function chooseRandomPrize(){
 
     /*
        Only Prize 1 through Prize 6
-       are allowed in random selection.
+       are included.
     */
 
     const availableCount =
@@ -1866,6 +1981,26 @@ async function startDraw(){
         return;
     }
 
+    /*
+       --------------------------------------------------------
+       HOST CHOICE MODE
+       --------------------------------------------------------
+
+       If the host has selected a participant and prize,
+       the next wheel spin MUST use that selection.
+    */
+
+    if(hostChoicePending){
+
+        await executeHostChoiceSpin();
+
+        return;
+    }
+
+    /* ========================================================
+       NORMAL RANDOM DRAW
+    ======================================================== */
+
     if(!prizes.length){
 
         alert(
@@ -1876,8 +2011,8 @@ async function startDraw(){
     }
 
     /*
-       Normal random drawing only works
-       with Prize 1 to Prize 6.
+       If there are only Prize 7+ items and no
+       Prize 1-6, normal random drawing is impossible.
     */
 
     if(
@@ -1939,6 +2074,10 @@ async function startDraw(){
         )
             break;
 
+        /*
+           Select random participant.
+        */
+
         const winnerIndex =
             Math.floor(
                 Math.random() *
@@ -1949,6 +2088,10 @@ async function startDraw(){
             participants[
                 winnerIndex
             ];
+
+        /*
+           Select prize using rarity system.
+        */
 
         const prize =
             chooseRandomPrize();
@@ -1974,15 +2117,6 @@ async function startDraw(){
             return;
         }
 
-        /*
-           The selected participant index
-           is passed directly to the wheel.
-
-           spinWheelToIndex() now calculates
-           the exact rotation required to place
-           this participant underneath the pointer.
-        */
-
         await spinWheelToIndex(
             winnerIndex
         );
@@ -1999,9 +2133,9 @@ async function startDraw(){
         );
 
         /*
-           Remove only the participant.
+           Remove participant.
 
-           The prize stays available.
+           Prize stays available.
         */
 
         participants.splice(
@@ -2045,25 +2179,381 @@ async function startDraw(){
 }
 
 /* ============================================================
-   WHEEL SPIN - FIXED ALIGNMENT
+   HOST CHOICE - SELECT ONLY, DO NOT DECLARE WINNER
+============================================================ */
+
+function hostChoice(){
+
+    if(drawing)
+        return;
+
+    /*
+       If a Host Choice is already waiting,
+       don't overwrite it accidentally.
+    */
+
+    if(hostChoicePending){
+
+        alert(
+            "A Host Choice is already waiting. Click SPIN THE WHEEL to complete it."
+        );
+
+        return;
+    }
+
+    const personId =
+        hostParticipant.value;
+
+    const prizeId =
+        hostPrize.value;
+
+    if(!personId){
+
+        alert(
+            "Choose a participant."
+        );
+
+        return;
+    }
+
+    if(!prizeId){
+
+        alert(
+            "Choose a prize."
+        );
+
+        return;
+    }
+
+    const person =
+        participants.find(
+            p => p.id === personId
+        );
+
+    const prize =
+        prizes.find(
+            p => p.id === prizeId
+        );
+
+    if(!person || !prize){
+
+        alert(
+            "The selected participant or prize is no longer available."
+        );
+
+        updateHostParticipants();
+
+        updateHostPrizes();
+
+        return;
+    }
+
+    /*
+       IMPORTANT:
+
+       We DO NOT show the winner here.
+
+       We only save the host's selection.
+
+       The next click on SPIN THE WHEEL
+       will physically spin the wheel and land
+       on this participant.
+    */
+
+    hostChoicePending = {
+
+        personId:person.id,
+
+        prizeId:prize.id
+
+    };
+
+    hostCard.classList.add(
+        "hostModeActive"
+    );
+
+    hostBadge.textContent =
+        "READY TO SPIN";
+
+    statusEl.textContent =
+        "HOST CHOICE READY";
+
+    statusEl.style.color =
+        "#ffd54a";
+
+    startBtn.textContent =
+        "🎡 SPIN TO SELECT "+person.name;
+
+    startBtn.style.background =
+        "linear-gradient(135deg,#ffd54a,#c58b00)";
+
+    startBtn.style.color =
+        "#1b1400";
+
+    hideWinner();
+
+    /*
+       Disable host controls while the pending
+       Host Choice is waiting.
+    */
+
+    hostParticipant.disabled = true;
+
+    hostPrize.disabled = true;
+
+    /*
+       Make the selected participant/prize obvious.
+    */
+
+    alert(
+        "Host Choice is ready.\n\nParticipant: " +
+        person.name +
+        "\nPrize: " +
+        prize.name +
+        "\n\nNow click SPIN THE WHEEL. The wheel will spin and land on this participant."
+    );
+}
+
+/* ============================================================
+   EXECUTE HOST CHOICE SPIN
+============================================================ */
+
+async function executeHostChoiceSpin(){
+
+    if(drawing)
+        return;
+
+    if(!hostChoicePending)
+        return;
+
+    const person =
+        participants.find(
+            p => p.id === hostChoicePending.personId
+        );
+
+    const prize =
+        prizes.find(
+            p => p.id === hostChoicePending.prizeId
+        );
+
+    /*
+       Make sure the selected items still exist.
+    */
+
+    if(!person || !prize){
+
+        alert(
+            "The selected Host Choice participant or prize is no longer available."
+        );
+
+        cancelHostChoice();
+
+        return;
+    }
+
+    const winnerIndex =
+        participants.findIndex(
+            p => p.id === person.id
+        );
+
+    if(winnerIndex < 0){
+
+        cancelHostChoice();
+
+        return;
+    }
+
+    drawing = true;
+
+    startBtn.disabled = true;
+
+    hostButton.disabled = true;
+
+    statusEl.textContent =
+        "HOST SPINNING";
+
+    statusEl.style.color =
+        "#ffd54a";
+
+    hideWinner();
+
+    /*
+       Give the host choice a proper suspense delay
+       before the wheel begins.
+    */
+
+    await sleep(500);
+
+    /*
+       IMPORTANT:
+
+       This uses the exact participant index
+       selected by the host.
+
+       The corrected spin function ensures
+       the wheel lands on this exact segment.
+    */
+
+    await spinWheelToIndex(
+        winnerIndex
+    );
+
+    /*
+       Now, and ONLY now, show the winner.
+    */
+
+    showWinner(
+        person,
+        prize
+    );
+
+    recordWinner(
+        person,
+        prize,
+        "Host Choice"
+    );
+
+    /*
+       Remove the participant after winning.
+
+       The prize remains available.
+    */
+
+    participants.splice(
+        winnerIndex,
+        1
+    );
+
+    renderParticipants();
+
+    renderPrizes();
+
+    updateHostParticipants();
+
+    updateHostPrizes();
+
+    drawWheel();
+
+    saveData();
+
+    /*
+       Clear Host Choice mode.
+
+       The NEXT spin will now be
+       completely normal/random again.
+    */
+
+    hostChoicePending = null;
+
+    hostCard.classList.remove(
+        "hostModeActive"
+    );
+
+    hostBadge.textContent =
+        "HOST ONLY";
+
+    hostParticipant.disabled = false;
+
+    hostPrize.disabled = false;
+
+    startBtn.textContent =
+        "🎡 SPIN THE WHEEL";
+
+    startBtn.style.background =
+        "";
+
+    startBtn.style.color =
+        "";
+
+    drawing = false;
+
+    startBtn.disabled = false;
+
+    hostButton.disabled = false;
+
+    statusEl.textContent =
+        "READY";
+
+    statusEl.style.color =
+        "#28e07b";
+
+    /*
+       Reset the host dropdowns.
+    */
+
+    hostParticipant.value = "";
+
+    hostPrize.value = "";
+
+    saveData();
+}
+
+/* ============================================================
+   CANCEL HOST CHOICE
+============================================================ */
+
+function cancelHostChoice(){
+
+    hostChoicePending = null;
+
+    hostCard.classList.remove(
+        "hostModeActive"
+    );
+
+    hostBadge.textContent =
+        "HOST ONLY";
+
+    hostParticipant.disabled = false;
+
+    hostPrize.disabled = false;
+
+    startBtn.textContent =
+        "🎡 SPIN THE WHEEL";
+
+    startBtn.style.background =
+        "";
+
+    startBtn.style.color =
+        "";
+
+    hostParticipant.value = "";
+
+    hostPrize.value = "";
+
+    if(!drawing){
+
+        statusEl.textContent =
+            "READY";
+
+        statusEl.style.color =
+            "#28e07b";
+    }
+}
+
+/* ============================================================
+   WHEEL SPIN
 ============================================================ */
 
 /*
-    IMPORTANT FIX:
+   This function is important.
 
-    The previous version added a random
-    0-360 degree rotation after calculating
-    the target position.
+   The wheel has to physically stop with the
+   selected participant directly under the pointer.
 
-    That extra partial rotation could move
-    the selected name away from the pointer.
+   The previous version added:
 
-    This version uses ONLY COMPLETE 360°
-    rotations for the suspense.
+       Math.random() * 360
 
-    Therefore the final wheel position
-    remains exactly aligned with the
-    selected participant.
+   after calculating the target.
+
+   That was the reason the displayed winner could
+   disagree with the name under the pointer.
+
+   We now use ONLY complete 360-degree rotations
+   before the final target adjustment.
+
+   Therefore the random suspense does NOT change
+   the final landing position.
 */
 
 function spinWheelToIndex(index){
@@ -2074,12 +2564,19 @@ function spinWheelToIndex(index){
             const total =
                 participants.length;
 
+            if(!total){
+
+                resolve();
+
+                return;
+            }
+
             const slice =
                 360 / total;
 
             /*
-               The center of the selected
-               participant's segment.
+               The center of this participant's
+               wheel segment.
             */
 
             const segmentCenter =
@@ -2087,7 +2584,7 @@ function spinWheelToIndex(index){
                 slice / 2;
 
             /*
-               Current wheel position modulo 360.
+               Current wheel rotation modulo 360.
             */
 
             const currentRotation =
@@ -2099,15 +2596,18 @@ function spinWheelToIndex(index){
                 ) % 360;
 
             /*
-               Calculate the exact additional
-               rotation needed to place the
-               selected segment at the pointer.
+               Rotation needed to put the selected
+               segment center directly beneath
+               the top pointer.
             */
 
             let targetRotation =
                 360 -
                 segmentCenter -
                 currentRotation;
+
+            targetRotation =
+                targetRotation % 360;
 
             if(targetRotation < 0){
 
@@ -2116,13 +2616,11 @@ function spinWheelToIndex(index){
             }
 
             /*
-               Random suspense is created by
-               adding 10, 11 or 12 COMPLETE
-               rotations.
+               Random number of COMPLETE spins.
 
-               Because these are full 360°
-               rotations, they do not change
-               the final selected position.
+               Because these are full 360-degree
+               rotations, they do not affect the
+               final selected segment.
             */
 
             const fullSpins =
@@ -2132,17 +2630,15 @@ function spinWheelToIndex(index){
                 );
 
             wheelRotation +=
-                (
-                    fullSpins * 360
-                ) +
+                fullSpins * 360 +
                 targetRotation;
 
             canvas.style.transform =
                 `rotate(${wheelRotation}deg)`;
 
             /*
-               CSS animation is 8.2 seconds.
-               Give it a small safety buffer.
+               CSS transition is 8.2 seconds.
+               Wait slightly longer before resolving.
             */
 
             setTimeout(
@@ -2214,19 +2710,7 @@ participantInput.addEventListener(
             )
         ){
 
-            setTimeout(
-                () => {
-
-                    if(
-                        document.activeElement ===
-                        participantInput
-                    ){
-
-                    }
-
-                },
-                250
-            );
+            hideWinner();
 
         }
 
@@ -2239,10 +2723,13 @@ winnerOverlay.addEventListener(
 );
 
 /* ============================================================
-   HOST CHOICE
+   HOST DROPDOWNS
 ============================================================ */
 
 function updateHostParticipants(){
+
+    const currentValue =
+        hostParticipant.value;
 
     hostParticipant.innerHTML = `
         <option value="">
@@ -2269,9 +2756,46 @@ function updateHostParticipants(){
             );
         }
     );
+
+    /*
+       Keep the current selection if it
+       still exists.
+    */
+
+    if(
+        participants.some(
+            p => p.id === currentValue
+        )
+    ){
+
+        hostParticipant.value =
+            currentValue;
+
+    }else if(hostChoicePending){
+
+        /*
+           If the pending participant was removed,
+           cancel the pending Host Choice.
+        */
+
+        if(
+            !participants.some(
+                p =>
+                    p.id ===
+                    hostChoicePending.personId
+            )
+        ){
+
+            cancelHostChoice();
+
+        }
+    }
 }
 
 function updateHostPrizes(){
+
+    const currentValue =
+        hostPrize.value;
 
     hostPrize.innerHTML = `
         <option value="">
@@ -2279,16 +2803,8 @@ function updateHostPrizes(){
         </option>
     `;
 
-    /*
-       IMPORTANT:
-
-       Host Choice receives ALL prizes.
-
-       That means Prize 1-6 AND Prize 7+.
-    */
-
     prizes.forEach(
-        function(prize,index){
+        function(prize){
 
             const option =
                 document.createElement(
@@ -2299,118 +2815,47 @@ function updateHostPrizes(){
                 prize.id;
 
             option.textContent =
-                "Prize "+(index+1)+" — "+prize.name;
+                prize.name;
 
             hostPrize.appendChild(
                 option
             );
         }
     );
-}
-
-async function hostChoice(){
-
-    if(drawing)
-        return;
-
-    const personId =
-        hostParticipant.value;
-
-    const prizeId =
-        hostPrize.value;
-
-    if(!personId){
-
-        alert(
-            "Choose a participant."
-        );
-
-        return;
-    }
-
-    if(!prizeId){
-
-        alert(
-            "Choose a prize."
-        );
-
-        return;
-    }
-
-    const person =
-        participants.find(
-            p => p.id === personId
-        );
-
-    const prize =
-        prizes.find(
-            p => p.id === prizeId
-        );
-
-    if(!person || !prize)
-        return;
-
-    drawing = true;
-
-    startBtn.disabled = true;
-
-    hostButton.disabled = true;
-
-    statusEl.textContent =
-        "HOST CHOICE";
-
-    statusEl.style.color =
-        "#ffd54a";
-
-    await sleep(1200);
-
-    showWinner(
-        person,
-        prize
-    );
-
-    recordWinner(
-        person,
-        prize,
-        "Host Choice"
-    );
-
-    participants =
-        participants.filter(
-            p => p.id !== person.id
-        );
 
     /*
-       Prize is NOT removed.
-
-       Host Choice can select ANY prize,
-       including Prize 7, Prize 8,
-       Prize 9 and beyond.
+       Keep the current selection if it
+       still exists.
     */
 
-    renderParticipants();
+    if(
+        prizes.some(
+            p => p.id === currentValue
+        )
+    ){
 
-    renderPrizes();
+        hostPrize.value =
+            currentValue;
 
-    updateHostParticipants();
+    }else if(hostChoicePending){
 
-    updateHostPrizes();
+        /*
+           If the pending prize was removed,
+           cancel the pending Host Choice.
+        */
 
-    drawWheel();
+        if(
+            !prizes.some(
+                p =>
+                    p.id ===
+                    hostChoicePending.prizeId
+            )
+        ){
 
-    saveData();
+            cancelHostChoice();
 
-    drawing = false;
-
-    startBtn.disabled = false;
-
-    hostButton.disabled = false;
-
-    statusEl.textContent =
-        "READY";
-
-    statusEl.style.color =
-        "#28e07b";
+        }
+    }
 }
 
 /* ============================================================
@@ -2655,6 +3100,9 @@ function loadData(){
 
 function resetAll(){
 
+    if(drawing)
+        return;
+
     if(
        !confirm(
             "Delete all participants, prizes and history?"
@@ -2669,6 +3117,8 @@ function resetAll(){
     winners = [];
 
     wheelRotation = 0;
+
+    hostChoicePending = null;
 
     canvas.style.transform =
         "rotate(0deg)";
@@ -2690,6 +3140,8 @@ function resetAll(){
     drawWheel();
 
     hideWinner();
+
+    cancelHostChoice();
 }
 
 /* ============================================================
@@ -2710,7 +3162,7 @@ function sleep(ms){
 function uid(){
 
     if(
-        crypto &&
+        typeof crypto !== "undefined" &&
         crypto.randomUUID
     ){
 
