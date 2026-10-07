@@ -1285,7 +1285,7 @@ function removeParticipant(id){
 
     participants =
         participants.filter(
-            p => p.id!== id
+            p => p.id !== id
         );
 
     renderParticipants();
@@ -1409,7 +1409,7 @@ function removePrize(id){
 
     prizes =
         prizes.filter(
-            p => p.id!== id
+            p => p.id !== id
         );
 
     renderPrizes();
@@ -1576,10 +1576,6 @@ function drawWheel(){
 
         ctx.stroke();
 
-        /* ============================================
-           BIGGER NAME TEXT
-        ============================================ */
-
         ctx.save();
 
         ctx.translate(
@@ -1602,15 +1598,6 @@ function drawWheel(){
 
         const nameLength =
             name.length;
-
-        /*
-           The text is intentionally much larger
-           than before.
-
-           Short names get the biggest text.
-           Longer names are reduced slightly so
-           they still fit inside their section.
-        */
 
         let fontSize;
 
@@ -1743,8 +1730,6 @@ function drawWheel(){
         ctx.restore();
     }
 
-    /* OUTER RING */
-
     ctx.beginPath();
 
     ctx.arc(
@@ -1779,13 +1764,12 @@ function drawWheel(){
     Prize 5 = Extremely Rare
     Prize 6 = Ultimately Rare
 
-    IMPORTANT:
-    Prize 7 and every prize after Prize 7
-    have ZERO chance of being selected here.
+    Prize 7 and above have ZERO chance
+    during a normal random draw.
 
     They are ONLY available through Host Choice.
 
-    The weights below are relative weights:
+    Relative weights:
 
     Prize 1 = 40
     Prize 2 = 25
@@ -1794,9 +1778,8 @@ function drawWheel(){
     Prize 5 = 6
     Prize 6 = 4
 
-    When fewer than 6 prizes exist, the available
-    prizes share the available weight and therefore
-    the percentages are automatically normalized.
+    If fewer than 6 prizes exist,
+    the available weights are normalized.
 */
 
 function chooseRandomPrize(){
@@ -1814,10 +1797,8 @@ function chooseRandomPrize(){
     ];
 
     /*
-       NEVER include Prize 7+.
-
        Only Prize 1 through Prize 6
-       can enter this random selection.
+       are allowed in random selection.
     */
 
     const availableCount =
@@ -1862,19 +1843,13 @@ function chooseRandomPrize(){
         }
     }
 
-    /*
-       Safety fallback.
-       This can ONLY return one of
-       Prize 1 through Prize 6.
-    */
-
     return prizes[
         availableCount - 1
     ];
 }
 
 /* ============================================================
-   START RANDOM DRAW - LONGER SUSPENSE + STAY OPEN
+   START RANDOM DRAW
 ============================================================ */
 
 async function startDraw(){
@@ -1901,9 +1876,8 @@ async function startDraw(){
     }
 
     /*
-       If there are only Prize 7+ items and
-       no Prize 1-6 exists, normal random draw
-       cannot select a prize.
+       Normal random drawing only works
+       with Prize 1 to Prize 6.
     */
 
     if(
@@ -1965,10 +1939,6 @@ async function startDraw(){
         )
             break;
 
-        /*
-           Select participant randomly.
-        */
-
         const winnerIndex =
             Math.floor(
                 Math.random() *
@@ -1979,16 +1949,6 @@ async function startDraw(){
             participants[
                 winnerIndex
             ];
-
-        /*
-           Select prize using the rarity system.
-
-           IMPORTANT:
-           This function can ONLY return
-           Prize 1 through Prize 6.
-
-           Prize 7+ is completely excluded.
-        */
 
         const prize =
             chooseRandomPrize();
@@ -2014,6 +1974,15 @@ async function startDraw(){
             return;
         }
 
+        /*
+           The selected participant index
+           is passed directly to the wheel.
+
+           spinWheelToIndex() now calculates
+           the exact rotation required to place
+           this participant underneath the pointer.
+        */
+
         await spinWheelToIndex(
             winnerIndex
         );
@@ -2030,12 +1999,9 @@ async function startDraw(){
         );
 
         /*
-           Participant is removed after winning.
+           Remove only the participant.
 
-           Prize is NOT removed.
-
-           This means the same Prize 1-6 can
-           appear again in future random draws.
+           The prize stays available.
         */
 
         participants.splice(
@@ -2079,8 +2045,26 @@ async function startDraw(){
 }
 
 /* ============================================================
-   WHEEL SPIN - LONGER
+   WHEEL SPIN - FIXED ALIGNMENT
 ============================================================ */
+
+/*
+    IMPORTANT FIX:
+
+    The previous version added a random
+    0-360 degree rotation after calculating
+    the target position.
+
+    That extra partial rotation could move
+    the selected name away from the pointer.
+
+    This version uses ONLY COMPLETE 360°
+    rotations for the suspense.
+
+    Therefore the final wheel position
+    remains exactly aligned with the
+    selected participant.
+*/
 
 function spinWheelToIndex(index){
 
@@ -2091,29 +2075,79 @@ function spinWheelToIndex(index){
                 participants.length;
 
             const slice =
-                360/total;
+                360 / total;
+
+            /*
+               The center of the selected
+               participant's segment.
+            */
 
             const segmentCenter =
-                index*slice +
-                slice/2;
+                index * slice +
+                slice / 2;
 
-            const target =
+            /*
+               Current wheel position modulo 360.
+            */
+
+            const currentRotation =
+                (
+                    (
+                        wheelRotation % 360
+                    ) +
+                    360
+                ) % 360;
+
+            /*
+               Calculate the exact additional
+               rotation needed to place the
+               selected segment at the pointer.
+            */
+
+            let targetRotation =
                 360 -
-                segmentCenter;
+                segmentCenter -
+                currentRotation;
 
-            const extra =
-                360*10 +
-                Math.random()*360;
+            if(targetRotation < 0){
+
+                targetRotation += 360;
+
+            }
+
+            /*
+               Random suspense is created by
+               adding 10, 11 or 12 COMPLETE
+               rotations.
+
+               Because these are full 360°
+               rotations, they do not change
+               the final selected position.
+            */
+
+            const fullSpins =
+                10 +
+                Math.floor(
+                    Math.random() * 3
+                );
 
             wheelRotation +=
-                extra + target;
+                (
+                    fullSpins * 360
+                ) +
+                targetRotation;
 
             canvas.style.transform =
                 `rotate(${wheelRotation}deg)`;
 
+            /*
+               CSS animation is 8.2 seconds.
+               Give it a small safety buffer.
+            */
+
             setTimeout(
                 resolve,
-                8300
+                8400
             );
         }
     );
@@ -2147,6 +2181,11 @@ function hideWinner(){
         "show"
     );
 }
+
+/*
+   Starting to type a new participant
+   closes the winner overlay.
+*/
 
 participantInput.addEventListener(
     "input",
@@ -2240,8 +2279,16 @@ function updateHostPrizes(){
         </option>
     `;
 
+    /*
+       IMPORTANT:
+
+       Host Choice receives ALL prizes.
+
+       That means Prize 1-6 AND Prize 7+.
+    */
+
     prizes.forEach(
-        function(prize){
+        function(prize,index){
 
             const option =
                 document.createElement(
@@ -2252,7 +2299,7 @@ function updateHostPrizes(){
                 prize.id;
 
             option.textContent =
-                prize.name;
+                "Prize "+(index+1)+" — "+prize.name;
 
             hostPrize.appendChild(
                 option
@@ -2334,11 +2381,11 @@ async function hostChoice(){
         );
 
     /*
-       Prize is intentionally NOT removed.
+       Prize is NOT removed.
 
        Host Choice can select ANY prize,
-       including Prize 7, Prize 8, Prize 9,
-       and so on.
+       including Prize 7, Prize 8,
+       Prize 9 and beyond.
     */
 
     renderParticipants();
